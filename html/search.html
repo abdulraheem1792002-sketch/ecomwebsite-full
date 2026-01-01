@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy | TrendStore</title>
+    <title>Search Results | TrendStore</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="css/privacy.css">
+    <link rel="stylesheet" href="../css/accessories.css"> <!-- Reuse grid styles -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
@@ -81,16 +81,6 @@
         </div>
         <div class="cart-items">
             <div class="empty-cart-msg">Your cart is empty.</div>
-            <!-- Example Item (Uncomment to visualize)
-            <div class="cart-item">
-                <div class="cart-item-img"></div>
-                <div class="cart-item-info">
-                    <h4>Classic Leather Jacket</h4>
-                    <p>$120.00 x 1</p>
-                </div>
-                <button class="remove-item"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            -->
         </div>
         <div class="cart-footer">
             <div class="cart-total">
@@ -102,43 +92,20 @@
     </div>
     <label for="cart-toggle" class="cart-overlay"></label>
 
-    <!-- Page Header -->
-    <section class="page-header">
+    <!-- Search Header -->
+    <section class="category-header">
         <div class="container">
-            <h1 class="page-title">Privacy Policy</h1>
-            <p class="page-subtitle">Last updated: January 1, 2026</p>
+            <h1 class="category-title" id="search-header-text">Search Results</h1>
         </div>
     </section>
 
-    <!-- Content Section -->
-    <section class="section privacy-content">
-        <div class="container text-container">
-            <h3>1. Introduction</h3>
-            <p>Welcome to TrendStore. We respect your privacy and are committed to protecting your personal data. This
-                privacy policy will inform you as to how we look after your personal data when you visit our website and
-                tell you about your privacy rights and how the law protects you.</p>
-
-            <h3>2. Data We Collect</h3>
-            <p>We may collect, use, store and transfer different kinds of personal data about you which we have grouped
-                together follows: Identity Data, Contact Data, Financial Data, Transaction Data, Technical Data.</p>
-
-            <h3>3. How We Use Your Data</h3>
-            <p>We will only use your personal data when the law allows us to. Most commonly, we will use your personal
-                data in the following circumstances:</p>
-            <ul>
-                <li>Where we need to perform the contract we are about to enter into or have entered into with you.</li>
-                <li>Where it is necessary for our legitimate interests (or those of a third party) and your interests
-                    and fundamental rights do not override those interests.</li>
-                <li>Where we need to comply with a legal or regulatory obligation.</li>
-            </ul>
-
-            <h3>4. Data Security</h3>
-            <p>We have put in place appropriate security measures to prevent your personal data from being accidentally
-                lost, used or accessed in an unauthorized way, altered or disclosed.</p>
-
-            <h3>5. Contact Details</h3>
-            <p>If you have any questions about this privacy policy or our privacy practices, please contact us at
-                privacy@trendstore.com.</p>
+    <!-- Product Grid -->
+    <section class="section products">
+        <div class="container">
+            <div class="product-grid" id="search-results-grid">
+                <!-- Results rendered via JS -->
+                <div style="grid-column: 1/-1; text-align: center;">Loading...</div>
+            </div>
         </div>
     </section>
 
@@ -152,9 +119,9 @@
             <div class="footer-col">
                 <h4>Shop</h4>
                 <ul>
-                    <li><a href="index.html#shop">Men</a></li>
-                    <li><a href="index.html#shop">Women</a></li>
-                    <li><a href="index.html#shop">Accessories</a></li>
+                    <li><a href="men.html">Men</a></li>
+                    <li><a href="women.html">Women</a></li>
+                    <li><a href="accessories.html">Accessories</a></li>
                 </ul>
             </div>
             <div class="footer-col">
@@ -180,9 +147,11 @@
         </div>
     </footer>
 
-    <!-- Cart Logic -->
-    <script src="../js/cart.js" defer></script>
-    <script src="../js/search-overlay.js" defer></script>
+    <!-- Scripts -->
+    <script src="../js/products.js"></script>
+    <script src="../js/cart.js"></script>
+    <script src="../js/search-overlay.js"></script>
+    <script src="../js/search.js"></script>
 </body>
 
 </html>

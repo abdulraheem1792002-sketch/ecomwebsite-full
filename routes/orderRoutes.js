@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
         res.json(orders);
     } catch (err) {
         console.error('Error fetching orders:', err);
-        res.status(500).json({ message: 'Failed to retrieve orders.' });
+        res.status(500).json({ message: 'Failed to retrieve orders.', error: err.message });
     }
 });
 
@@ -69,7 +69,7 @@ router.patch('/:id', async (req, res) => {
         res.json({ message: 'Order updated', order: updatedOrder });
     } catch (err) {
         console.error('Error updating order:', err);
-        res.status(500).json({ message: 'Error saving order' });
+        res.status(500).json({ message: 'Error saving order', error: err.message });
     }
 });
 
@@ -104,7 +104,7 @@ router.post('/', async (req, res) => {
         res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder.id });
     } catch (err) {
         console.error('Error saving order:', err);
-        res.status(500).json({ message: 'Failed to save order.' });
+        res.status(500).json({ message: 'Failed to save order.', error: err.message });
     }
 });
 

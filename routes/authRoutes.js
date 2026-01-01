@@ -25,7 +25,7 @@ router.post('/signup', async (req, res) => {
             return res.status(409).json({ message: 'Email already registered.' });
         }
         console.error('Error signing up:', err);
-        res.status(500).json({ message: 'Failed to register user.' });
+        res.status(500).json({ message: 'Failed to register user.', error: err.message });
     }
 });
 
@@ -59,7 +59,7 @@ router.post('/login', async (req, res) => {
         }
     } catch (err) {
         console.error('Error logging in:', err);
-        res.status(500).json({ message: 'Login failed.' });
+        res.status(500).json({ message: 'Login failed.', error: err.message });
     }
 });
 
@@ -109,7 +109,7 @@ router.put('/profile', async (req, res) => {
             return res.status(409).json({ message: 'Email already in use.' });
         }
         console.error('Error updating profile:', err);
-        res.status(500).json({ message: 'Failed to update profile.' });
+        res.status(500).json({ message: 'Failed to update profile.', error: err.message });
     }
 });
 

@@ -4,15 +4,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Women's Collection | TrendStore</title>
+    <title>Product Details | TrendStore</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="../css/women.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .product-details {
+            padding: 4rem 0;
+        }
+
+        .details-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .details-image {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #eee;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .details-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 20px;
+        }
+
+        .details-info h1 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .details-category {
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .details-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .details-description {
+            line-height: 1.8;
+            color: var(--text-color);
+            margin-bottom: 2.5rem;
+        }
+
+        .details-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .details-add-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .details-add-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .details-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -72,16 +160,6 @@
         </div>
         <div class="cart-items">
             <div class="empty-cart-msg">Your cart is empty.</div>
-            <!-- Example Item (Uncomment to visualize)
-            <div class="cart-item">
-                <div class="cart-item-img"></div>
-                <div class="cart-item-info">
-                    <h4>Classic Leather Jacket</h4>
-                    <p>$120.00 x 1</p>
-                </div>
-                <button class="remove-item"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            -->
         </div>
         <div class="cart-footer">
             <div class="cart-total">
@@ -93,66 +171,11 @@
     </div>
     <label for="cart-toggle" class="cart-overlay"></label>
 
-    <!-- Category Header -->
-    <section class="category-header">
-        <div class="container">
-            <h1 class="category-title">Women's Collection</h1>
-            <p class="category-description">Discover chic and elegant styles. From evening wear to everyday essentials,
-                find your perfect look.</p>
-        </div>
-    </section>
-
-    <!-- Product Grid -->
-    <section class="section products">
-        <div class="container">
-            <div class="product-grid">
-                <!-- Product 1 -->
-                <article class="product-card" data-id="9" data-name="Summer Cotton Dress" data-price="55.00"
-                    data-image="../images/product-3.jpg">
-                    <div class="product-image">
-                        <div class="image-placeholder">
-                            <a href="product.html?id=9">
-                                <!-- Using T-Shirt as placeholder, IRL this would be distinct -->
-                                <img src="../images/product-3.jpg" alt="Summer Dress">
-                            </a>
-                        </div>
-                        <button class="add-to-cart-btn"><i class="fa-solid fa-plus"></i> Add</button>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-name">Summer Cotton Dress</h3>
-                        <p class="product-category">Dresses</p>
-                        <span class="product-price">$55.00</span>
-                    </div>
-                </article>
-
-                <!-- Example Item (Uncomment to visualize)
-            <div class="cart-item">
-                <div class="cart-item-img"></div>
-                <div class="cart-item-info">
-                    <h4>Classic Leather Jacket</h4>
-                    <p>$120.00 x 1</p>
-                </div>
-                <button class="remove-item"><i class="fa-solid fa-trash"></i></button>
-            </div>
-            -->
-                <!-- Product 2 -->
-                <article class="product-card" data-id="10" data-name="High Waist Jeans" data-price="48.00"
-                    data-image="../images/product-2.jpg">
-                    <div class="product-image">
-                        <div class="image-placeholder">
-                            <a href="product.html?id=10">
-                                <img src="../images/product-2.jpg" alt="High Waist Jeans">
-                            </a>
-                        </div>
-                        <button class="add-to-cart-btn"><i class="fa-solid fa-plus"></i> Add</button>
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-name">High Waist Jeans</h3>
-                        <p class="product-category">Bottoms</p>
-                        <span class="product-price">$48.00</span>
-                    </div>
-                </article>
-            </div>
+    <!-- Product Details Section -->
+    <section class="product-details">
+        <div class="container details-container" id="product-container">
+            <!-- Loading State -->
+            <div class="loading">Loading product details...</div>
         </div>
     </section>
 
@@ -194,8 +217,10 @@
         </div>
     </footer>
 
-    <!-- Cart Logic -->
-    <script src="../js/cart.js" defer></script>
+    <!-- Scripts -->
+    <script src="../js/products.js"></script>
+    <script src="../js/cart.js"></script>
+    <script src="../js/product-details.js"></script>
 </body>
 
 </html>

@@ -107,10 +107,13 @@
         <div class="container">
             <div class="product-grid">
                 <!-- Product 1 -->
-                <article class="product-card">
+                <article class="product-card" data-id="1" data-name="Classic Leather Jacket" data-price="120.00"
+                    data-image="../images/product-1.jpg">
                     <div class="product-image">
                         <div class="image-placeholder">
-                            <img src="../images/product-1.jpg" alt="Classic Leather Jacket">
+                            <a href="product.html?id=1">
+                                <img src="../images/product-1.jpg" alt="Classic Leather Jacket">
+                            </a>
                         </div>
                         <button class="add-to-cart-btn"><i class="fa-solid fa-plus"></i> Add</button>
                     </div>
@@ -122,10 +125,13 @@
                 </article>
 
                 <!-- Product 2 -->
-                <article class="product-card">
+                <article class="product-card" data-id="3" data-name="Cotton T-Shirt" data-price="25.00"
+                    data-image="../images/product-3.jpg">
                     <div class="product-image">
                         <div class="image-placeholder">
-                            <img src="../images/product-3.jpg" alt="Cotton T-Shirt">
+                            <a href="product.html?id=3">
+                                <img src="../images/product-3.jpg" alt="Cotton T-Shirt">
+                            </a>
                         </div>
                         <button class="add-to-cart-btn"><i class="fa-solid fa-plus"></i> Add</button>
                     </div>
@@ -137,10 +143,13 @@
                 </article>
 
                 <!-- Product 3 -->
-                <article class="product-card">
+                <article class="product-card" data-id="2" data-name="Denim Jeans" data-price="45.00"
+                    data-image="../images/product-2.jpg">
                     <div class="product-image">
                         <div class="image-placeholder">
-                            <img src="../images/product-2.jpg" alt="Denim Jeans">
+                            <a href="product.html?id=2">
+                                <img src="../images/product-2.jpg" alt="Denim Jeans">
+                            </a>
                         </div>
                         <button class="add-to-cart-btn"><i class="fa-solid fa-plus"></i> Add</button>
                     </div>
@@ -192,6 +201,8 @@
         </div>
     </footer>
 
+    <!-- Cart Logic -->
+    <script src="../js/cart.js" defer></script>
 </body>
 
 </html>

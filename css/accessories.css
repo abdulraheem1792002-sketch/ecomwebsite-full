@@ -1,0 +1,27 @@
+/* --- Accessories Category Styles --- */
+.category-header {
+    background-color: #f9f9f9;
+    padding: 3rem 0;
+    text-align: center;
+    margin-bottom: 3rem;
+    border-bottom: 2px solid #999;
+}
+
+.category-title {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.category-description {
+    color: var(--text-light);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Accessories might have smaller grid items or different layouts */
+.product-grid {
+    gap: 40px;
+    /* More spacing */
+}

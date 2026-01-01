@@ -1,0 +1,23 @@
+/* --- Privacy Page Styles --- */
+.text-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.privacy-content h3 {
+    font-size: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+.privacy-content p,
+.privacy-content ul {
+    margin-bottom: 1rem;
+    color: var(--text-light);
+}
+
+.privacy-content ul {
+    padding-left: 20px;
+    list-style: circle;
+}

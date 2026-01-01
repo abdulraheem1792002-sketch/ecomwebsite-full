@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | TrendStore</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/about.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- CSS-Only Toggles -->
+    <input type="checkbox" id="cart-toggle" class="toggle-checkbox">
+    <input type="checkbox" id="menu-toggle" class="toggle-checkbox">
+
+    <!-- Header / Navbar -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">
+                Trend<span>Store</span>.
+            </a>
+
+            <label for="menu-toggle" class="mobile-menu-btn">
+                <i class="fa-solid fa-bars"></i>
+            </label>
+
+            <nav class="navbar">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li class="dropdown">
+                        <a href="index.html#shop" class="nav-link dropdown-toggle">Shop <i
+                                class="fa-solid fa-chevron-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="men.html">Men</a></li>
+                            <li><a href="women.html">Women</a></li>
+                            <li><a href="accessories.html">Accessories</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="blog.html" class="nav-link">Blog</a></li>
+                    <li><a href="about.html" class="nav-link active">About</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                    <li class="mobile-only"><a href="#" class="nav-link">Cart (0)</a></li>
+                    <!-- Mobile Sign In Link -->
+                    <li class="mobile-only"><a href="signin.html" class="nav-link">Sign In</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-icons">
+                <button class="icon-btn search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <a href="signin.html" class="icon-btn user-btn"><i class="fa-regular fa-user"></i></a>
+                <label for="cart-toggle" class="icon-btn cart-btn">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-count">0</span>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Sidebar (Same as index) -->
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <label for="cart-toggle" class="close-cart"><i class="fa-solid fa-xmark"></i></label>
+        </div>
+        <div class="cart-items">
+            <div class="empty-cart-msg">Your cart is empty.</div>
+            <!-- Example Item (Uncomment to visualize)
+            <div class="cart-item">
+                <div class="cart-item-img"></div>
+                <div class="cart-item-info">
+                    <h4>Classic Leather Jacket</h4>
+                    <p>$120.00 x 1</p>
+                </div>
+                <button class="remove-item"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            -->
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span>$0.00</span>
+            </div>
+            <a href="signin.html" class="btn btn-checkout">Checkout</a>
+        </div>
+    </div>
+    <label for="cart-toggle" class="cart-overlay"></label>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1 class="page-title">About Us</h1>
+            <p class="page-subtitle">Our Story & Mission</p>
+        </div>
+    </section>
+
+    <!-- Content Section -->
+    <section class="section text-page-content">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>Defining Modern Style</h2>
+                    <p>Founded in 2024, TrendStore began with a simple mission: to make premium, high-quality fashion
+                        accessible to everyone. We believe that style is a form of self-expression, and everyone
+                        deserves to look and feel their best.</p>
+                    <p>Our journey started in a small studio, curating a handful of unique pieces. Today, we are proud
+                        to offer a diverse collection that blends timeless elegance with contemporary trends, sourced
+                        from ethical manufacturers around the globe.</p>
+                </div>
+                <div class="about-image">
+                    <!-- Placeholder for team/office image -->
+                    <div class="image-placeholder"><img src="images/hero-image.jpg" alt="Our Team"></div>
+                </div>
+            </div>
+
+            <div class="values-grid">
+                <div class="value-card">
+                    <i class="fa-solid fa-gem"></i>
+                    <h3>Quality First</h3>
+                    <p>We never compromise on the quality of our materials or craftsmanship.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fa-solid fa-earth-americas"></i>
+                    <h3>Sustainability</h3>
+                    <p>We are committed to eco-friendly practices and ethical sourcing.</p>
+                </div>
+                <div class="value-card">
+                    <i class="fa-solid fa-heart"></i>
+                    <h3>Customer Love</h3>
+                    <p>Your satisfaction is at the heart of everything we do.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-col">
+                <a href="index.html" class="logo footer-logo">Trend<span>Store</span>.</a>
+                <p>Premium quality products for your lifestyle.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="index.html#shop">Men</a></li>
+                    <li><a href="index.html#shop">Women</a></li>
+                    <li><a href="index.html#shop">Accessories</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://twitter.com/" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="https://www.facebook.com/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TrendStore. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

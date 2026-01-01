@@ -1,0 +1,105 @@
+[
+  {
+    "id": "ORD-1767263585659",
+    "date": "2026-01-01T10:33:05.659Z",
+    "status": "Delivered",
+    "items": [
+      {
+        "id": "1",
+        "name": "Test Product",
+        "price": 50,
+        "quantity": 1
+      }
+    ],
+    "total": 50,
+    "recipient": {
+      "name": "Test User"
+    }
+  },
+  {
+    "id": "ORD-1767263686074",
+    "date": "2026-01-01T10:34:46.074Z",
+    "status": "Shipped",
+    "userId": "1767263243260",
+    "customerName": "Abdul Raheem",
+    "items": [
+      {
+        "id": "3",
+        "name": "Cotton T-Shirt",
+        "price": 25,
+        "image": "../images/product-3.jpg",
+        "quantity": 1
+      }
+    ],
+    "total": 25,
+    "shippingDetails": {
+      "firstName": "Abdul",
+      "lastName": "Raheem",
+      "email": "abcd@gmail.com",
+      "address": "MACHINE MOHALA NO 2",
+      "city": "JHELUM",
+      "zip": "49600",
+      "cardName": "sdfghh",
+      "cardNumber": "678967438765",
+      "expDate": "12/29",
+      "cvv": "754"
+    }
+  },
+  {
+    "id": "ORD-1767263835214",
+    "date": "2026-01-01T10:37:15.214Z",
+    "status": "Cancelled",
+    "userId": "1767263728521",
+    "customerName": "Abdul Raheem",
+    "items": [
+      {
+        "id": "1",
+        "name": "Classic Leather Jacket",
+        "price": 120,
+        "image": "../images/product-1.jpg",
+        "quantity": 1
+      },
+      {
+        "id": "4",
+        "name": "Running Sneakers",
+        "price": 89,
+        "image": "../images/product-4.jpg",
+        "quantity": 1
+      },
+      {
+        "id": "2",
+        "name": "Denim Jeans",
+        "price": 45,
+        "image": "../images/product-2.jpg",
+        "quantity": 1
+      },
+      {
+        "id": "7",
+        "name": "Aviator Sunglasses",
+        "price": 150,
+        "image": "../images/sunglasses.png",
+        "quantity": 1
+      },
+      {
+        "id": "8",
+        "name": "Urban Backpack",
+        "price": 75,
+        "image": "../images/backpack.png",
+        "quantity": 1
+      }
+    ],
+    "total": 479,
+    "shippingDetails": {
+      "firstName": "Abdul",
+      "lastName": "Raheem",
+      "email": "abdul.raheem.17.9.2002@gmail.com",
+      "address": "MACHINE MOHALA NO 2",
+      "city": "JHELUM",
+      "zip": "49600",
+      "cardName": "raheem",
+      "cardNumber": "7689367898665444",
+      "expDate": "12/28",
+      "cvv": "983"
+    }
+  }
+]

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | TrendStore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+    <header class="admin-header">
+        <div class="container">
+            <h3>TrendStore Admin</h3>
+            <a href="index.html" class="btn btn-secondary">Back to Store</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="dashboard-head"
+            style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <h1>Dashboard Overview</h1>
+            <button class="btn btn-primary" onclick="loadOrders()">Refresh Data</button>
+        </div>
+
+        <!-- Tabs -->
+        <div class="admin-tabs" style="margin-bottom: 20px;">
+            <button class="tab-btn active" id="tab-orders" onclick="switchTab('orders')">Orders</button>
+            <button class="tab-btn" id="tab-products" onclick="switchTab('products')">Products</button>
+        </div>
+
+        <!-- ORDERS VIEW -->
+        <div id="view-orders" class="admin-view active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-value" id="total-revenue">$0.00</span>
+                    <span class="stat-label">Total Revenue</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="total-orders">0</span>
+                    <span class="stat-label">Total Orders</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="avg-order">$0.00</span>
+                    <span class="stat-label">Avg. Order Value</span>
+                </div>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; margin-bottom: 1rem;">
+                <h3>Recent Orders</h3>
+                <button class="btn btn-primary" onclick="loadOrders()">Refresh Orders</button>
+            </div>
+
+            <div class="dashboard-container">
+                <table id="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="6" style="text-align: center;">Loading...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- PRODUCTS VIEW -->
+        <div id="view-products" class="admin-view" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3>Product Inventory</h3>
+                <button class="btn btn-primary" onclick="openProductModal()">+ Add New Product</button>
+            </div>
+
+            <div class="dashboard-container">
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-table-body">
+                        <!-- Products Rendered Here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Order Details Modal -->
+    <div class="modal-overlay" id="order-modal">
+        <div class="modal">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <h2>Order Details <span id="modal-order-id" style="font-size: 1rem; color: #888;"></span></h2>
+
+            <div class="modal-section">
+                <h4>Customer Info</h4>
+                <p id="modal-customer"></p>
+                <p id="modal-address"></p>
+            </div>
+
+            <div class="modal-section">
+                <h4>Items</h4>
+                <div id="modal-items">
+                    <!-- Items injected here -->
+                </div>
+            </div>
+
+            <div class="modal-section" style="text-align: right; margin-top: 1rem;">
+                <h3 style="color: var(--primary-color);">Total: <span id="modal-total"></span></h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Form Modal -->
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="product-modal-title">Add Product</h2>
+                <button class="close-modal" onclick="closeModal('product-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="product-form">
+                    <input type="hidden" id="edit-product-id">
+
+                    <div class="form-group">
+                        <label>Product Name</label>
+                        <input type="text" id="p-name" required class="form-input">
+                    </div>
+
+                    <div class="form-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label>Price ($)</label>
+                            <input type="number" id="p-price" step="0.01" required class="form-input">
+                        </div>
+                        <div>
+                            <label>Category</label>
+                            <select id="p-category" class="form-input">
+                                <option value="Men">Men</option>
+                                <option value="Women">Women</option>
+                                <option value="Accessories">Accessories</option>
+                                <option value="Outerwear">Outerwear</option>
+                                <option value="Tops">Tops</option>
+                                <option value="Bottoms">Bottoms</option>
+                                <option value="Footwear">Footwear</option>
+                                <option value="Bags">Bags</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Image URL</label>
+                        <input type="text" id="p-image" placeholder="../images/product-1.jpg" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="p-description" rows="3" class="form-input"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Save
+                        Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/admin.js"></script>
+    <script src="../js/auth.js" defer></script>
+</body>
+
+</html>

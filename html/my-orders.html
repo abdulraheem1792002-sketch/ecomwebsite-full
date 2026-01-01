@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders | TrendStore</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="../css/admin.css"> <!-- Reuse table styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Reuse Header Structure (Simplified for this page) -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">Trend<span>Store</span>.</a>
+            <div class="header-icons">
+                <a href="index.html" class="btn btn-secondary">Back to Store</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="flex: 1; padding-top: 2rem;">
+        <div class="account-header"
+            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>My Account</h1>
+            <button class="btn btn-secondary" onclick="logout()">Logout</button>
+        </div>
+
+        <!-- Account Tabs -->
+        <div class="admin-tabs" style="margin-bottom: 20px; border-bottom: 2px solid #eee; display: flex; gap: 20px;">
+            <button class="tab-btn active" onclick="switchAccountTab('orders')" id="tab-orders"
+                style="background: none; border: none; font-size: 1rem; cursor: pointer; padding-bottom: 5px; border-bottom: 2px solid transparent;">My
+                Orders</button>
+            <button class="tab-btn" onclick="switchAccountTab('profile')" id="tab-profile"
+                style="background: none; border: none; font-size: 1rem; cursor: pointer; padding-bottom: 5px; border-bottom: 2px solid transparent;">Profile
+                Settings</button>
+        </div>
+
+        <!-- ORDERS SECTION -->
+        <div id="view-orders" class="account-view active">
+            <div class="orders-container" style="overflow-x: auto;">
+                <table class="orders-table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8fafc; text-align: left;">
+                            <th style="padding: 1rem;">Order ID</th>
+                            <th style="padding: 1rem;">Date</th>
+                            <th style="padding: 1rem;">Status</th>
+                            <th style="padding: 1rem;">Total</th>
+                            <th style="padding: 1rem;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-list">
+                        <!-- Orders injected here -->
+                    </tbody>
+                </table>
+                <div id="no-orders" style="display: none; text-align: center; padding: 2rem; color: #666;">
+                    You haven't placed any orders yet.
+                </div>
+            </div>
+        </div>
+
+        <!-- PROFILE SECTION -->
+        <div id="view-profile" class="account-view" style="display: none; max-width: 500px;">
+            <form id="profile-form"
+                style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Full Name</label>
+                    <input type="text" id="p-name" required
+                        style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Email Address</label>
+                    <input type="email" id="p-email" required
+                        style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 500;">New Password <span
+                            style="color: #666; font-size: 0.8rem; font-weight: normal;">(Leave blank to keep
+                            current)</span></label>
+                    <input type="password" id="p-password" placeholder="Enter new password"
+                        style="width: 100%; padding: 0.8rem; border: 1px solid #ddd; border-radius: 4px;">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Update Profile</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="../js/my-orders.js"></script>
+    <script src="../js/auth.js" defer></script>
+</body>
+
+</html>

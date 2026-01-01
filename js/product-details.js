@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
     const container = document.getElementById('product-container');
@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = '<p>Product not specified.</p>';
         return;
     }
+
+    // Ensure products are loaded
+    await fetchProducts();
 
     // Look up product in the global 'products' array (from products.js)
     const product = products.find(p => p.id === productId);

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1767263243260",
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "password123",
+    "role": "user"
+  },
+  {
+    "id": "1767263728521",
+    "name": "Abdul Raheem",
+    "email": "abdul.raheem.17.9.2002@gmail.com",
+    "password": "araheemitcs",
+    "role": "admin"
+  }
+]

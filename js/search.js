@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const query = urlParams.get('q');
     const resultsContainer = document.getElementById('search-results-grid');
@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (searchHeader) searchHeader.textContent = `Search Results for "${query}"`;
+
+    // Ensure products are loaded
+    await fetchProducts();
 
     // Perform Search (Case insensitive, checking name and category)
     const lowerQuery = query.toLowerCase();

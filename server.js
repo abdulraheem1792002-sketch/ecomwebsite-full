@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const { sql } = require('@vercel/postgres');
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
 const orderRoutes = require('./routes/orderRoutes');
@@ -31,6 +32,35 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 // Routes
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date() });
+});
+
+// Temporary route to initialize DB from browser
+app.get('/api/init-db', async (req, res) => {
+    try {
+        await sql`
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL,
+                role TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+        `;
+        await sql`
+            CREATE TABLE IF NOT EXISTS orders (
+                id TEXT PRIMARY KEY,
+                user_id TEXT REFERENCES users(id),
+                status TEXT NOT NULL,
+                order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                data JSONB
+            );
+        `;
+        res.send('Database initialized successfully! Users and Orders tables created.');
+    } catch (err) {
+        console.error('Init DB Error:', err);
+        res.status(500).send('Error initializing database: ' + err.message);
+    }
 });
 
 // Fallback to index.html for any other route (SPA behavior, though this is MPA)

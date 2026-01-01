@@ -1,76 +1,80 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
-
-const ordersPath = path.join(__dirname, '../data/orders.json');
-
-// Helper to read orders
-const getOrders = () => {
-    try {
-        if (!fs.existsSync(ordersPath)) {
-            fs.writeFileSync(ordersPath, '[]');
-            return [];
-        }
-        const data = fs.readFileSync(ordersPath, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        console.error('Error reading orders:', err);
-        return [];
-    }
-};
-
-// Helper to save orders
-const saveOrders = (orders) => {
-    try {
-        fs.writeFileSync(ordersPath, JSON.stringify(orders, null, 2));
-        return true;
-    } catch (err) {
-        console.error('Error saving orders:', err);
-        return false;
-    }
-};
+const { sql } = require('@vercel/postgres');
 
 // GET /api/orders
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     const userId = req.query.userId;
-    let orders = getOrders();
 
-    // Filter if userId matches
-    if (userId) {
-        orders = orders.filter(order => order.userId === userId);
+    try {
+        let result;
+        if (userId) {
+            result = await sql`
+                SELECT * FROM orders 
+                WHERE user_id = ${userId}
+                ORDER BY order_date DESC
+            `;
+        } else {
+            result = await sql`
+                SELECT * FROM orders 
+                ORDER BY order_date DESC
+            `;
+        }
+
+        // Map back to the structure the frontend expects 
+        // We stored extra data in the 'data' JSONB column, so we might want to merge it.
+        const orders = result.rows.map(row => ({
+            ...row.data, // Spread the JSON structure
+            id: row.id,
+            userId: row.user_id,
+            status: row.status,
+            date: row.order_date
+        }));
+
+        res.json(orders);
+    } catch (err) {
+        console.error('Error fetching orders:', err);
+        res.status(500).json({ message: 'Failed to retrieve orders.' });
     }
-
-    // Sort by newest first
-    orders.sort((a, b) => new Date(b.date) - new Date(a.date));
-    res.json(orders);
 });
 
 // PATCH /api/orders/:id (Update Status)
-router.patch('/:id', (req, res) => {
+router.patch('/:id', async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const orders = getOrders();
-    const orderIndex = orders.findIndex(o => o.id === id);
+    try {
+        // We update the status column AND the status field inside the JSONB data to keep them in sync
+        const result = await sql`
+            UPDATE orders 
+            SET status = ${status}, 
+                data = jsonb_set(data, '{status}', ${JSON.stringify(status)})
+            WHERE id = ${id}
+            RETURNING *
+        `;
 
-    if (orderIndex === -1) {
-        return res.status(404).json({ message: 'Order not found' });
-    }
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
 
-    // Update status
-    orders[orderIndex].status = status;
-    // Update modified date if desired: orders[orderIndex].updatedAt = new Date().toISOString();
+        const row = result.rows[0];
+        const updatedOrder = {
+            ...row.data,
+            id: row.id,
+            userId: row.user_id,
+            status: row.status,
+            date: row.order_date
+        };
 
-    if (saveOrders(orders)) {
-        res.json({ message: 'Order updated', order: orders[orderIndex] });
-    } else {
+        res.json({ message: 'Order updated', order: updatedOrder });
+    } catch (err) {
+        console.error('Error updating order:', err);
         res.status(500).json({ message: 'Error saving order' });
     }
 });
 
 // POST /api/orders (Place Order)
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
     const orderData = req.body;
 
     // Basic Validation
@@ -78,20 +82,28 @@ router.post('/', (req, res) => {
         return res.status(400).json({ message: 'Cart is empty.' });
     }
 
-    const orders = getOrders();
-
     const newOrder = {
-        id: 'ORD-' + Date.now(), // Simple ID generation
+        id: 'ORD-' + Date.now(),
         date: new Date().toISOString(),
-        status: 'Pending', // Pending, Processing, Shipped, Delivered
+        status: 'Pending',
         ...orderData
     };
 
-    orders.push(newOrder);
+    try {
+        await sql`
+            INSERT INTO orders (id, user_id, status, order_date, data)
+            VALUES (
+                ${newOrder.id}, 
+                ${newOrder.userId || null}, 
+                ${newOrder.status}, 
+                ${newOrder.date}, 
+                ${newOrder}
+            )
+        `;
 
-    if (saveOrders(orders)) {
         res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder.id });
-    } else {
+    } catch (err) {
+        console.error('Error saving order:', err);
         res.status(500).json({ message: 'Failed to save order.' });
     }
 });

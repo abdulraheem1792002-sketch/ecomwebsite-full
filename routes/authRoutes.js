@@ -1,38 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
-
-const usersPath = path.join(__dirname, '../data/users.json');
-
-// Helper to read users
-const getUsers = () => {
-    try {
-        if (!fs.existsSync(usersPath)) {
-            fs.writeFileSync(usersPath, '[]');
-            return [];
-        }
-        const data = fs.readFileSync(usersPath, 'utf8');
-        return JSON.parse(data);
-    } catch (err) {
-        console.error('Error reading users:', err);
-        return [];
-    }
-};
-
-// Helper to save users
-const saveUsers = (users) => {
-    try {
-        fs.writeFileSync(usersPath, JSON.stringify(users, null, 2));
-        return true;
-    } catch (err) {
-        console.error('Error saving users:', err);
-        return false;
-    }
-};
+const { sql } = require('@vercel/postgres');
 
 // POST /api/auth/signup
-router.post('/signup', (req, res) => {
+router.post('/signup', async (req, res) => {
     const { name, email, password } = req.body;
 
     // Basic Validation
@@ -40,101 +11,104 @@ router.post('/signup', (req, res) => {
         return res.status(400).json({ message: 'All fields are required.' });
     }
 
-    const users = getUsers();
+    try {
+        // Create User
+        // Storing as plain text for this prototype as per original code. USE BCRYPT IN PRODUCTION.
+        await sql`
+            INSERT INTO users (id, name, email, password, role)
+            VALUES (${Date.now().toString()}, ${name}, ${email}, ${password}, 'user')
+        `;
 
-    // Check if user exists
-    if (users.find(u => u.email === email)) {
-        return res.status(409).json({ message: 'Email already registered.' });
-    }
-
-    // Create User
-    const newUser = {
-        id: Date.now().toString(),
-        name,
-        email,
-        password // Storing as plain text for this prototype. USE BCRYPT IN PRODUCTION.
-    };
-
-    users.push(newUser);
-
-    if (saveUsers(users)) {
         res.status(201).json({ message: 'User registered successfully!' });
-    } else {
-        res.status(500).json({ message: 'Failed to save user.' });
+    } catch (err) {
+        if (err.code === '23505') { // Unique violation for email
+            return res.status(409).json({ message: 'Email already registered.' });
+        }
+        console.error('Error signing up:', err);
+        res.status(500).json({ message: 'Failed to register user.' });
     }
 });
 
 // POST /api/auth/login
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
         return res.status(400).json({ message: 'Email and password required.' });
     }
 
-    const users = getUsers();
+    try {
+        // Find User
+        const { rows } = await sql`SELECT * FROM users WHERE email = ${email}`;
+        const user = rows[0];
 
-    // Find User
-    const user = users.find(u => u.email === email && u.password === password);
-
-    if (user) {
-        // Return user info (success)
-        // In a real app, we would issue a JWT token here.
-        res.json({
-            message: 'Login successful',
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                role: user.role // Critical for frontend permissions
-            }
-        });
-    } else {
-        res.status(401).json({ message: 'Invalid credentials.' });
+        if (user && user.password === password) {
+            // Return user info (success)
+            // In a real app, we would issue a JWT token here.
+            res.json({
+                message: 'Login successful',
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
+            });
+        } else {
+            res.status(401).json({ message: 'Invalid credentials.' });
+        }
+    } catch (err) {
+        console.error('Error logging in:', err);
+        res.status(500).json({ message: 'Login failed.' });
     }
 });
 
 // PUT /api/auth/profile
-router.put('/profile', (req, res) => {
+router.put('/profile', async (req, res) => {
     const { id, name, email, password } = req.body;
 
     if (!id || !name || !email) {
         return res.status(400).json({ message: 'Missing required fields.' });
     }
 
-    const users = getUsers();
-    const index = users.findIndex(u => u.id === id);
+    try {
+        // Update User
+        // We use COALESCE or just passed value if we want to overwrite.
+        // If password is plain text, handle carefully.
 
-    if (index === -1) {
-        return res.status(404).json({ message: 'User not found.' });
-    }
-
-    // Email Uniqueness Check (if email changed)
-    if (users[index].email !== email) {
-        if (users.find(u => u.email === email)) {
-            return res.status(409).json({ message: 'Email already in use.' });
+        let result;
+        if (password) {
+            result = await sql`
+                UPDATE users 
+                SET name = ${name}, email = ${email}, password = ${password}
+                WHERE id = ${id}
+                RETURNING id, name, email, role
+            `;
+        } else {
+            result = await sql`
+                UPDATE users 
+                SET name = ${name}, email = ${email}
+                WHERE id = ${id}
+                RETURNING id, name, email, role
+            `;
         }
-    }
 
-    // Update User
-    users[index] = {
-        ...users[index],
-        name,
-        email,
-        password: password || users[index].password // Only update password if provided
-    };
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
 
-    if (saveUsers(users)) {
+        const updatedUser = result.rows[0];
+
         res.json({
             message: 'Profile updated successfully.',
-            user: {
-                id: users[index].id,
-                name: users[index].name,
-                email: users[index].email,
-                role: users[index].role
-            }
+            user: updatedUser
         });
-    } else {
+
+    } catch (err) {
+        if (err.code === '23505') {
+            return res.status(409).json({ message: 'Email already in use.' });
+        }
+        console.error('Error updating profile:', err);
         res.status(500).json({ message: 'Failed to update profile.' });
     }
 });

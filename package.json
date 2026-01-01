@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/abdulraheem1792002-sketch/E-com-website-template-frontend#readme",
   "dependencies": {
+    "@vercel/postgres": "^0.10.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1"

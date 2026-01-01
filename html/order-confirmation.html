@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmed | TrendStore</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .confirmation-section {
+            padding: 6rem 0;
+            text-align: center;
+        }
+
+        .confirmation-icon {
+            font-size: 5rem;
+            color: #27ae60;
+            margin-bottom: 2rem;
+        }
+
+        .confirmation-title {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .confirmation-message {
+            color: var(--text-color);
+            margin-bottom: 3rem;
+            font-size: 1.1rem;
+        }
+
+        .continue-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .continue-btn:hover {
+            background-color: var(--secondary-color);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- CSS-Only Toggles -->
+    <input type="checkbox" id="cart-toggle" class="toggle-checkbox">
+    <input type="checkbox" id="menu-toggle" class="toggle-checkbox">
+
+    <!-- Search Overlay -->
+    <div id="search-overlay">
+        <button class="search-close" id="search-close"><i class="fa-solid fa-xmark"></i></button>
+        <div class="search-container">
+            <input type="text" class="search-input" id="search-input" placeholder="Search products...">
+            <p class="search-help">Press Enter to search</p>
+        </div>
+    </div>
+
+    <!-- Header / Navbar -->
+    <header class="header">
+        <div class="container header-container">
+            <a href="index.html" class="logo">
+                Trend<span>Store</span>.
+            </a>
+
+            <label for="menu-toggle" class="mobile-menu-btn">
+                <i class="fa-solid fa-bars"></i>
+            </label>
+
+            <nav class="navbar">
+                <ul class="nav-list">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li class="dropdown">
+                        <a href="index.html#shop" class="nav-link dropdown-toggle">Shop <i
+                                class="fa-solid fa-chevron-down"></i></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="men.html">Men</a></li>
+                            <li><a href="women.html">Women</a></li>
+                            <li><a href="accessories.html">Accessories</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="blog.html" class="nav-link">Blog</a></li>
+                    <li><a href="about.html" class="nav-link">About</a></li>
+                    <li><a href="contact.html" class="nav-link">Contact</a></li>
+                    <li class="mobile-only"><a href="#" class="nav-link">Cart (0)</a></li>
+                    <!-- Mobile Sign In Link -->
+                    <li class="mobile-only"><a href="signin.html" class="nav-link">Sign In</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-icons">
+                <button class="icon-btn search-btn"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <a href="signin.html" class="icon-btn user-btn"><i class="fa-regular fa-user"></i></a>
+                <label for="cart-toggle" class="icon-btn cart-btn">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span class="cart-count">0</span>
+                </label>
+            </div>
+        </div>
+    </header>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar">
+        <div class="cart-header">
+            <h3>Your Cart</h3>
+            <label for="cart-toggle" class="close-cart"><i class="fa-solid fa-xmark"></i></label>
+        </div>
+        <div class="cart-items">
+            <div class="empty-cart-msg">Your cart is empty.</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span>$0.00</span>
+            </div>
+            <a href="checkout.html" class="btn btn-checkout">Checkout</a>
+        </div>
+    </div>
+    <label for="cart-toggle" class="cart-overlay"></label>
+
+    <!-- Success Message -->
+    <section class="section confirmation-section">
+        <div class="container">
+            <div class="confirmation-icon">
+                <i class="fa-regular fa-circle-check"></i>
+            </div>
+            <h1 class="confirmation-title">Thank You for Your Order!</h1>
+            <p class="confirmation-message">Your order has been placed successfully. A confirmation email has been sent
+                to you.</p>
+            <a href="index.html" class="continue-btn">Continue Shopping</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-container">
+            <div class="footer-col">
+                <a href="index.html" class="logo footer-logo">Trend<span>Store</span>.</a>
+                <p>Premium quality products for your lifestyle.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="men.html">Men</a></li>
+                    <li><a href="women.html">Women</a></li>
+                    <li><a href="accessories.html">Accessories</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="blog.html">Blog</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Follow Us</h4>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="https://twitter.com/" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="https://www.facebook.com/" target="_blank"><i class="fa-brands fa-facebook-f"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 TrendStore. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="../js/cart.js"></script>
+    <script src="../js/search-overlay.js"></script>
+</body>
+
+</html>

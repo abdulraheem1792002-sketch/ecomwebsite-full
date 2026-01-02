@@ -1,135 +1,137 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs');
-const path = require('path');
-
-const dataPath = path.join(__dirname, '../data/products.json');
-
-// Helper to read data
-const getProducts = () => {
-    const data = fs.readFileSync(dataPath, 'utf8');
-    return JSON.parse(data);
-};
-
-// Helper to save data
-const saveProducts = (products) => {
-    try {
-        fs.writeFileSync(dataPath, JSON.stringify(products, null, 2));
-        return true;
-    } catch (err) {
-        console.error('Error saving products:', err);
-        return false;
-    }
-};
+const db = require('../db');
 
 // GET /api/products
-router.get('/', (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const products = getProducts();
-        res.json(products);
+        const result = await db.query('SELECT * FROM products ORDER BY created_at DESC');
+        res.json(result.rows);
     } catch (err) {
+        // If table doesn't exist yet, return empty array instead of error
+        if (err.code === '42P01') {
+            return res.json([]);
+        }
+        console.error('Error fetching products:', err);
         res.status(500).json({ message: 'Error fetching products' });
     }
 });
 
 // GET /api/products/:id
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
-        const products = getProducts();
-        const product = products.find(p => p.id === req.params.id);
+        const { id } = req.params;
+        const result = await db.query('SELECT * FROM products WHERE id = $1', [id]);
 
-        if (product) {
-            res.json(product);
+        if (result.rows.length > 0) {
+            res.json(result.rows[0]);
         } else {
             res.status(404).json({ message: 'Product not found' });
         }
     } catch (err) {
+        console.error('Error fetching product:', err);
         res.status(500).json({ message: 'Error fetching product' });
     }
 });
 
 // POST /api/products (Create)
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
+    const { name, price, image, category, description } = req.body;
+
+    if (!name || !price) {
+        return res.status(400).json({ message: 'Name and price are required' });
+    }
+
+    const newProduct = {
+        id: Date.now().toString(),
+        name,
+        price: parseFloat(price),
+        image: image || '../images/placeholder.png',
+        category: category || 'Uncategorized',
+        description: description || ''
+    };
+
     try {
-        const { name, price, image, category, description } = req.body;
+        await db.query(
+            'INSERT INTO products (id, name, price, image, category, description) VALUES ($1, $2, $3, $4, $5, $6)',
+            [newProduct.id, newProduct.name, newProduct.price, newProduct.image, newProduct.category, newProduct.description]
+        );
 
-        if (!name || !price) {
-            return res.status(400).json({ message: 'Name and price are required' });
-        }
-
-        const products = getProducts();
-        const newProduct = {
-            id: Date.now().toString(),
-            name,
-            price: parseFloat(price),
-            image: image || '../images/placeholder.png', // Default image
-            category: category || 'Uncategorized',
-            description: description || ''
-        };
-
-        products.push(newProduct);
-
-        if (saveProducts(products)) {
-            res.status(201).json({ message: 'Product created', product: newProduct });
-        } else {
-            res.status(500).json({ message: 'Error saving product' });
-        }
+        res.status(201).json({ message: 'Product created', product: newProduct });
     } catch (err) {
-        res.status(500).json({ message: 'Server error' });
+        // Auto-fix: Table doesn't exist (ERROR: relation "products" does not exist)
+        if (err.code === '42P01') {
+            try {
+                console.log('Table "products" missing. Creating now...');
+                await db.query(`
+                    CREATE TABLE IF NOT EXISTS products (
+                        id TEXT PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        price NUMERIC NOT NULL,
+                        image TEXT,
+                        category TEXT,
+                        description TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    )
+                `);
+                // Retry Insert
+                await db.query(
+                    'INSERT INTO products (id, name, price, image, category, description) VALUES ($1, $2, $3, $4, $5, $6)',
+                    [newProduct.id, newProduct.name, newProduct.price, newProduct.image, newProduct.category, newProduct.description]
+                );
+                return res.status(201).json({ message: 'Product created', product: newProduct });
+            } catch (retryErr) {
+                console.error('Auto-creation of products table failed:', retryErr);
+            }
+        }
+
+        console.error('Error saving product:', err);
+        res.status(500).json({ message: 'Error saving product' });
     }
 });
 
 // PUT /api/products/:id (Update)
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
+    const { id } = req.params;
+    const { name, price, image, category, description } = req.body;
+
     try {
-        const { id } = req.params;
-        const { name, price, image, category, description } = req.body;
+        // We do a dynamic update or just simple update of all fields
+        const result = await db.query(`
+            UPDATE products 
+            SET name = COALESCE($1, name),
+                price = COALESCE($2, price),
+                image = COALESCE($3, image),
+                category = COALESCE($4, category),
+                description = COALESCE($5, description)
+            WHERE id = $6
+            RETURNING *
+        `, [name, price ? parseFloat(price) : null, image, category, description, id]);
 
-        const products = getProducts();
-        const index = products.findIndex(p => p.id === id);
-
-        if (index === -1) {
+        if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        // Update fields
-        products[index] = {
-            ...products[index],
-            name: name || products[index].name,
-            price: price ? parseFloat(price) : products[index].price,
-            image: image || products[index].image,
-            category: category || products[index].category,
-            description: description || products[index].description
-        };
-
-        if (saveProducts(products)) {
-            res.json({ message: 'Product updated', product: products[index] });
-        } else {
-            res.status(500).json({ message: 'Error saving product' });
-        }
+        res.json({ message: 'Product updated', product: result.rows[0] });
     } catch (err) {
+        console.error('Error updating product:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });
 
 // DELETE /api/products/:id (Delete)
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const products = getProducts();
+        const result = await db.query('DELETE FROM products WHERE id = $1', [id]);
 
-        const newProducts = products.filter(p => p.id !== id);
-
-        if (products.length === newProducts.length) {
+        if (result.rowCount === 0) {
             return res.status(404).json({ message: 'Product not found' });
         }
 
-        if (saveProducts(newProducts)) {
-            res.json({ message: 'Product deleted' });
-        } else {
-            res.status(500).json({ message: 'Error deleting product' });
-        }
+        res.json({ message: 'Product deleted' });
     } catch (err) {
+        console.error('Error deleting product:', err);
         res.status(500).json({ message: 'Server error' });
     }
 });

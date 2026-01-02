@@ -35,9 +35,13 @@ app.get('/api/health', (req, res) => {
 });
 
 // Temporary route to initialize DB from browser
+const db = require('./db');
+// ... imports
+
+// Temporary route to initialize DB from browser
 app.get('/api/init-db', async (req, res) => {
     try {
-        await sql`
+        await db.query(`
             CREATE TABLE IF NOT EXISTS users (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
@@ -45,17 +49,17 @@ app.get('/api/init-db', async (req, res) => {
                 password TEXT NOT NULL,
                 role TEXT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        `;
-        await sql`
+            )
+        `);
+        await db.query(`
             CREATE TABLE IF NOT EXISTS orders (
                 id TEXT PRIMARY KEY,
                 user_id TEXT REFERENCES users(id),
                 status TEXT NOT NULL,
                 order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 data JSONB
-            );
-        `;
+            )
+        `);
         res.send('Database initialized successfully! Users and Orders tables created.');
     } catch (err) {
         console.error('Init DB Error:', err);

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { sql } = require('@vercel/postgres');
+const db = require('../db');
 
 // POST /api/auth/signup
 router.post('/signup', async (req, res) => {
@@ -13,11 +13,10 @@ router.post('/signup', async (req, res) => {
 
     try {
         // Create User
-        // Storing as plain text for this prototype as per original code. USE BCRYPT IN PRODUCTION.
-        await sql`
-            INSERT INTO users (id, name, email, password, role)
-            VALUES (${Date.now().toString()}, ${name}, ${email}, ${password}, 'user')
-        `;
+        await db.query(
+            'INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)',
+            [Date.now().toString(), name, email, password, 'user']
+        );
 
         res.status(201).json({ message: 'User registered successfully!' });
     } catch (err) {
@@ -25,11 +24,11 @@ router.post('/signup', async (req, res) => {
             return res.status(409).json({ message: 'Email already registered.' });
         }
 
-        // Auto-fix: Table doesn't exist (Vercel Postgres common issue)
+        // Auto-fix: Table doesn't exist (ERROR: relation "users" does not exist)
         if (err.code === '42P01') {
             try {
                 console.log('Table "users" missing. Creating now...');
-                await sql`
+                await db.query(`
                     CREATE TABLE IF NOT EXISTS users (
                         id TEXT PRIMARY KEY,
                         name TEXT NOT NULL,
@@ -37,17 +36,16 @@ router.post('/signup', async (req, res) => {
                         password TEXT NOT NULL,
                         role TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    );
-                `;
+                    )
+                `);
                 // Retry creation
-                await sql`
-                    INSERT INTO users (id, name, email, password, role)
-                    VALUES (${Date.now().toString()}, ${name}, ${email}, ${password}, 'user')
-                `;
+                await db.query(
+                    'INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)',
+                    [Date.now().toString(), name, email, password, 'user']
+                );
                 return res.status(201).json({ message: 'User registered successfully!' });
             } catch (retryErr) {
                 console.error('Auto-creation failed:', retryErr);
-                // Fall through to error response
             }
         }
 
@@ -66,12 +64,10 @@ router.post('/login', async (req, res) => {
 
     try {
         // Find User
-        const { rows } = await sql`SELECT * FROM users WHERE email = ${email}`;
+        const { rows } = await db.query('SELECT * FROM users WHERE email = $1', [email]);
         const user = rows[0];
 
         if (user && user.password === password) {
-            // Return user info (success)
-            // In a real app, we would issue a JWT token here.
             res.json({
                 message: 'Login successful',
                 user: {
@@ -99,25 +95,17 @@ router.put('/profile', async (req, res) => {
     }
 
     try {
-        // Update User
-        // We use COALESCE or just passed value if we want to overwrite.
-        // If password is plain text, handle carefully.
-
         let result;
         if (password) {
-            result = await sql`
-                UPDATE users 
-                SET name = ${name}, email = ${email}, password = ${password}
-                WHERE id = ${id}
-                RETURNING id, name, email, role
-            `;
+            result = await db.query(
+                'UPDATE users SET name = $1, email = $2, password = $3 WHERE id = $4 RETURNING id, name, email, role',
+                [name, email, password, id]
+            );
         } else {
-            result = await sql`
-                UPDATE users 
-                SET name = ${name}, email = ${email}
-                WHERE id = ${id}
-                RETURNING id, name, email, role
-            `;
+            result = await db.query(
+                'UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING id, name, email, role',
+                [name, email, id]
+            );
         }
 
         if (result.rowCount === 0) {
@@ -125,11 +113,7 @@ router.put('/profile', async (req, res) => {
         }
 
         const updatedUser = result.rows[0];
-
-        res.json({
-            message: 'Profile updated successfully.',
-            user: updatedUser
-        });
+        res.json({ message: 'Profile updated successfully.', user: updatedUser });
 
     } catch (err) {
         if (err.code === '23505') {

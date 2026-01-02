@@ -24,6 +24,33 @@ router.post('/signup', async (req, res) => {
         if (err.code === '23505') { // Unique violation for email
             return res.status(409).json({ message: 'Email already registered.' });
         }
+
+        // Auto-fix: Table doesn't exist (Vercel Postgres common issue)
+        if (err.code === '42P01') {
+            try {
+                console.log('Table "users" missing. Creating now...');
+                await sql`
+                    CREATE TABLE IF NOT EXISTS users (
+                        id TEXT PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        email TEXT UNIQUE NOT NULL,
+                        password TEXT NOT NULL,
+                        role TEXT,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                `;
+                // Retry creation
+                await sql`
+                    INSERT INTO users (id, name, email, password, role)
+                    VALUES (${Date.now().toString()}, ${name}, ${email}, ${password}, 'user')
+                `;
+                return res.status(201).json({ message: 'User registered successfully!' });
+            } catch (retryErr) {
+                console.error('Auto-creation failed:', retryErr);
+                // Fall through to error response
+            }
+        }
+
         console.error('Error signing up:', err);
         res.status(500).json({ message: 'Failed to register user.', error: err.message });
     }

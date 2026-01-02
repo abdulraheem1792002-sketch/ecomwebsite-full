@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('Account created! Please sign in.');
                     window.location.href = 'signin.html';
                 } else {
-                    alert(data.message || 'Signup failed.');
+                    alert(data.message + (data.error ? '\nError: ' + data.error : ''));
                 }
             } catch (err) {
                 console.error(err);
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     alert('Welcome back, ' + data.user.name + '!');
                     window.location.href = 'index.html';
                 } else {
-                    alert(data.message || 'Login failed.');
+                    alert(data.message + (data.error ? '\nError: ' + data.error : ''));
                 }
             } catch (err) {
                 console.error(err);

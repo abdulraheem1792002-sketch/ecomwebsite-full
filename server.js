@@ -61,18 +61,58 @@ app.get('/api/init-db', async (req, res) => {
             )
         `);
         res.send('Database initialized successfully! Users and Orders tables created.');
-    } catch (err) {
-        console.error('Init DB Error:', err);
-        res.status(500).send('Error initializing database: ' + err.message);
-    }
-});
+        const fs = require('fs');
 
-// Fallback to index.html for any other route (SPA behavior, though this is MPA)
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'html', 'index.html'));
-});
+        // Temporary route to seed products from JSON to DB
+        app.get('/api/seed-products', async (req, res) => {
+            try {
+                const dataPath = path.join(__dirname, 'data/products.json');
+                if (!fs.existsSync(dataPath)) {
+                    return res.status(404).send('products.json not found');
+                }
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+                const products = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
+
+                let count = 0;
+
+                // Ensure table exists first (in case it wasn't created yet)
+                await db.query(`
+            CREATE TABLE IF NOT EXISTS products (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                price NUMERIC NOT NULL,
+                image TEXT,
+                category TEXT,
+                description TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+                for (const p of products) {
+                    // Check if exists
+                    const check = await db.query('SELECT id FROM products WHERE id = $1', [p.id]);
+                    if (check.rowCount === 0) {
+                        await db.query(
+                            'INSERT INTO products (id, name, price, image, category, description) VALUES ($1, $2, $3, $4, $5, $6)',
+                            [p.id, p.name, p.price, p.image, p.category, p.description]
+                        );
+                        count++;
+                    }
+                }
+
+                res.send(`Seeding complete! Added ${count} new products to the database.`);
+            } catch (err) {
+                console.error('Seed error:', err);
+                res.status(500).send('Error seeding products: ' + err.message);
+            }
+        });
+
+        // Fallback to index.html for any other route (SPA behavior, though this is MPA)
+        app.get('/', (req, res) => {
+            res.sendFile(path.join(__dirname, 'html', 'index.html'));
+        });
+
+        // Start Server
+        app.listen(PORT, () => {
+            console.log(`Server running on http://localhost:${PORT}`);
+        });

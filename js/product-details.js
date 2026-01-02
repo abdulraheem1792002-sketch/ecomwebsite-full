@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         <div class="details-info">
             <span class="details-category">${product.category}</span>
             <h1>${product.name}</h1>
-            <span class="details-price">$${product.price.toFixed(2)}</span>
+            <span class="details-price">$${parseFloat(product.price).toFixed(2)}</span>
             <p class="details-description">${product.description}</p>
             
             <div class="details-actions">

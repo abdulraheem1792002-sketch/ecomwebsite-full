@@ -87,14 +87,14 @@ function updateCartUI() {
                 cartItem.classList.add('cart-item');
                 // Ensure image path is correct relative to HTML
                 // We assume image paths stored are like "../images/foo.jpg"
-                
+
                 cartItem.innerHTML = `
                     <div class="cart-item-img">
                         <img src="${item.image}" alt="${item.name}" style="width:100%; height:100%; object-fit:cover;">
                     </div>
                     <div class="cart-item-info">
                         <h4>${item.name}</h4>
-                        <p>$${item.price.toFixed(2)} x ${item.quantity}</p>
+                        <p>$${parseFloat(item.price).toFixed(2)} x ${item.quantity}</p>
                     </div>
                     <button class="remove-item" data-id="${item.id}"><i class="fa-solid fa-trash"></i></button>
                 `;
@@ -104,7 +104,7 @@ function updateCartUI() {
     }
 
     // Update Total Price
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
     if (cartTotalElement) {
         cartTotalElement.textContent = '$' + total.toFixed(2);
     }

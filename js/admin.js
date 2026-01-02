@@ -221,7 +221,7 @@ async function loadProducts() {
                 <td><img src="${p.image}" alt="${p.name}" style="width: 50px; hieght: 50px; object-fit: cover; border-radius: 4px;"></td>
                 <td><strong>${p.name}</strong></td>
                 <td>${p.category}</td>
-                <td>$${p.price.toFixed(2)}</td>
+                <td>$${parseFloat(p.price).toFixed(2)}</td>
                 <td>
                     <div class="action-btn-group">
                         <button class="btn btn-edit btn-sm" onclick="openProductModal('${p.id}')">Edit</button>

@@ -233,7 +233,8 @@ async function loadProducts() {
         });
     } catch (err) {
         console.error(err);
-        tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error loading products</td></tr>';
+        console.error(err);
+        tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Error: ${err.message || 'Unknown error'}</td></tr>`;
     }
 }
 

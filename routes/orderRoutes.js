@@ -89,6 +89,30 @@ router.post('/', async (req, res) => {
 
         res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder.id });
     } catch (err) {
+        // Auto-fix: Table doesn't exist (ERROR: relation "orders" does not exist)
+        if (err.code === '42P01') {
+            try {
+                console.log('Table "orders" missing. Creating now...');
+                await db.query(`
+                    CREATE TABLE IF NOT EXISTS orders (
+                        id TEXT PRIMARY KEY,
+                        user_id TEXT REFERENCES users(id),
+                        status TEXT NOT NULL,
+                        order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        data JSONB
+                    )
+                `);
+                // Retry Insert
+                await db.query(
+                    'INSERT INTO orders (id, user_id, status, order_date, data) VALUES ($1, $2, $3, $4, $5)',
+                    [newOrder.id, newOrder.userId || null, newOrder.status, newOrder.date, newOrder]
+                );
+                return res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder.id });
+            } catch (retryErr) {
+                console.error('Auto-creation of orders table failed:', retryErr);
+            }
+        }
+
         console.error('Error saving order:', err);
         res.status(500).json({ message: 'Failed to save order.', error: err.message });
     }

@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     productGrid.innerHTML = ''; // Clear existing content (loaders or hardcoded)
 
+    if (products.length === 0) {
+        productGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No products found. Please run <a href="/api/seed-products">Seed Tool</a> to restore data.</p>';
+        return;
+    }
+
     featuredProducts.forEach(product => {
         const productCard = document.createElement('article');
         productCard.classList.add('product-card');

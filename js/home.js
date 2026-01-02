@@ -23,7 +23,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Render Featured Products (First 8)
-    const featuredProducts = products.slice(0, 8);
+    // Render All Products
+    const featuredProducts = products;
 
     productGrid.innerHTML = ''; // Clear existing content (loaders or hardcoded)
 

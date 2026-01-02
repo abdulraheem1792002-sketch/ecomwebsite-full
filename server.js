@@ -254,6 +254,37 @@ app.get('/api/seed-products', async (req, res) => {
     }
 });
 
+// Debug Route to check DB status directly
+app.get('/api/debug-db', async (req, res) => {
+    try {
+        const tableQuery = await db.query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+        const tables = tableQuery.rows.map(r => r.table_name);
+
+        let report = {
+            status: 'Connected',
+            tables: tables,
+            counts: {}
+        };
+
+        if (tables.includes('products')) {
+            const products = await db.query('SELECT * FROM products');
+            report.counts.products = products.rowCount;
+            report.sample_products = products.rows.slice(0, 3);
+        } else {
+            report.status = 'ERROR: products table missing';
+        }
+
+        if (tables.includes('users')) {
+            const users = await db.query('SELECT * FROM users');
+            report.counts.users = users.rowCount;
+        }
+
+        res.json(report);
+    } catch (err) {
+        res.status(500).json({ error: err.message, stack: err.stack });
+    }
+});
+
 // Fallback to index.html for any other route (SPA behavior, though this is MPA)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'html', 'index.html'));

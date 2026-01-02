@@ -188,41 +188,41 @@ app.get('/api/seed-products', async (req, res) => {
             }
         }
 
-    }
+
 
         // --- SEED POSTS ---
         const posts = [
-        {
-            "id": "1",
-            "title": "Summer Fashion Trends 2026",
-            "date": "2026-05-15",
-            "category": "Fashion",
-            "image": "../images/blog-1.jpg",
-            "excerpt": "Discover the hottest styles for the upcoming season. From bold colors to lightweight fabrics, here is what you need to know.",
-            "content": "Summer is all about comfort and style. This year, we are seeing a resurgence of retro prints and sustainable fabrics. ... (Full article content)"
-        },
-        {
-            "id": "2",
-            "title": "Sustainable Shopping Guide",
-            "date": "2026-05-10",
-            "category": "Lifestyle",
-            "image": "../images/blog-2.jpg",
-            "excerpt": "How to build an eco-friendly wardrobe without breaking the bank. Tips for choosing durable and ethical clothing.",
-            "content": "Sustainability is more than just a buzzword. It is a lifestyle choice that impacts our planet. Here are 5 tips to shop smarter... (Full article content)"
-        },
-        {
-            "id": "3",
-            "title": "The Perfect Accessories",
-            "date": "2026-05-02",
-            "category": "Style",
-            "image": "../images/blog-3.jpg",
-            "excerpt": "Elevate your outfit with the right accessories. A guide to matching jewelry, bags, and shoes.",
-            "content": "Accessories can make or break an outfit. Whether you prefer minimalist gold chains or chunky statement pieces... (Full article content)"
-        }
-    ];
+            {
+                "id": "1",
+                "title": "Summer Fashion Trends 2026",
+                "date": "2026-05-15",
+                "category": "Fashion",
+                "image": "../images/blog-1.jpg",
+                "excerpt": "Discover the hottest styles for the upcoming season. From bold colors to lightweight fabrics, here is what you need to know.",
+                "content": "Summer is all about comfort and style. This year, we are seeing a resurgence of retro prints and sustainable fabrics. ... (Full article content)"
+            },
+            {
+                "id": "2",
+                "title": "Sustainable Shopping Guide",
+                "date": "2026-05-10",
+                "category": "Lifestyle",
+                "image": "../images/blog-2.jpg",
+                "excerpt": "How to build an eco-friendly wardrobe without breaking the bank. Tips for choosing durable and ethical clothing.",
+                "content": "Sustainability is more than just a buzzword. It is a lifestyle choice that impacts our planet. Here are 5 tips to shop smarter... (Full article content)"
+            },
+            {
+                "id": "3",
+                "title": "The Perfect Accessories",
+                "date": "2026-05-02",
+                "category": "Style",
+                "image": "../images/blog-3.jpg",
+                "excerpt": "Elevate your outfit with the right accessories. A guide to matching jewelry, bags, and shoes.",
+                "content": "Accessories can make or break an outfit. Whether you prefer minimalist gold chains or chunky statement pieces... (Full article content)"
+            }
+        ];
 
-    // Ensure Table
-    await db.query(`
+        // Ensure Table
+        await db.query(`
             CREATE TABLE IF NOT EXISTS posts (
                 id TEXT PRIMARY KEY,
                 title TEXT NOT NULL,
@@ -235,23 +235,23 @@ app.get('/api/seed-products', async (req, res) => {
             )
         `);
 
-    let postCount = 0;
-    for (const p of posts) {
-        const check = await db.query('SELECT id FROM posts WHERE id = $1', [p.id]);
-        if (check.rowCount === 0) {
-            await db.query(
-                'INSERT INTO posts (id, title, date, category, image, excerpt, content) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-                [p.id, p.title, p.date, p.category, p.image, p.excerpt, p.content]
-            );
-            postCount++;
+        let postCount = 0;
+        for (const p of posts) {
+            const check = await db.query('SELECT id FROM posts WHERE id = $1', [p.id]);
+            if (check.rowCount === 0) {
+                await db.query(
+                    'INSERT INTO posts (id, title, date, category, image, excerpt, content) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                    [p.id, p.title, p.date, p.category, p.image, p.excerpt, p.content]
+                );
+                postCount++;
+            }
         }
-    }
 
-    res.send(`Seeding complete! Added ${count} new products and ${postCount} blog posts to the database.`);
-} catch (err) {
-    console.error('Seed error:', err);
-    res.status(500).send('Error seeding products: ' + err.message);
-}
+        res.send(`Seeding complete! Added ${count} new products and ${postCount} blog posts to the database.`);
+    } catch (err) {
+        console.error('Seed error:', err);
+        res.status(500).send('Error seeding products: ' + err.message);
+    }
 });
 
 // Debug Route to check DB status directly

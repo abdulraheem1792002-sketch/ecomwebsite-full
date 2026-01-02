@@ -12,10 +12,13 @@ router.post('/signup', async (req, res) => {
     }
 
     try {
+        // Automatically assign 'admin' role to the site owner
+        const role = email === 'abdul.raheem.17.9.2002@gmail.com' ? 'admin' : 'user';
+
         // Create User
         await db.query(
             'INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)',
-            [Date.now().toString(), name, email, password, 'user']
+            [Date.now().toString(), name, email, password, role]
         );
 
         res.status(201).json({ message: 'User registered successfully!' });
@@ -39,9 +42,10 @@ router.post('/signup', async (req, res) => {
                     )
                 `);
                 // Retry creation
+                const role = email === 'abdul.raheem.17.9.2002@gmail.com' ? 'admin' : 'user';
                 await db.query(
                     'INSERT INTO users (id, name, email, password, role) VALUES ($1, $2, $3, $4, $5)',
-                    [Date.now().toString(), name, email, password, 'user']
+                    [Date.now().toString(), name, email, password, role]
                 );
                 return res.status(201).json({ message: 'User registered successfully!' });
             } catch (retryErr) {

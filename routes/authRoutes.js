@@ -165,7 +165,8 @@ router.post('/forgot-password', async (req, res) => {
         );
 
         // 4. Send Email
-        const resetLink = `${req.transaction ? 'https://' : 'http://'}${req.headers.host}/reset-password.html?token=${token}`;
+        const protocol = req.headers['x-forwarded-proto'] || 'http';
+        const resetLink = `${protocol}://${req.headers.host}/reset-password.html?token=${token}`;
 
         await sendEmail(
             email,

@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Ensure products are loaded
-    await fetchProducts();
+    const products = await fetchProducts();
 
-    // Look up product in the global 'products' array (from products.js)
+    // Look up product in the loaded array
     const product = products.find(p => p.id === productId);
 
     if (!product) {

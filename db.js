@@ -1,4 +1,3 @@
-```javascript
 const { createPool } = require('@vercel/postgres');
 require('dotenv').config();
 
@@ -9,4 +8,3 @@ const pool = createPool({
 module.exports = {
     query: (text, params) => pool.query(text, params),
 };
-```

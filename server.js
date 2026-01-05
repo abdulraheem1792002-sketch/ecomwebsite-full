@@ -21,6 +21,34 @@ app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/posts', require('./routes/blogRoutes'));
 
+// Contact Route
+app.post('/api/contact', async (req, res) => {
+    const { name, email, subject, message } = req.body;
+    try {
+        // Ensure table exists
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS messages (
+                id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+                name TEXT NOT NULL,
+                email TEXT NOT NULL,
+                subject TEXT NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
+        await db.query(
+            'INSERT INTO messages (name, email, subject, message) VALUES ($1, $2, $3, $4)',
+            [name, email, subject, message]
+        );
+
+        res.json({ success: true, message: 'Message sent successfully!' });
+    } catch (err) {
+        console.error('Contact error:', err);
+        res.status(500).json({ error: 'Failed to send message: ' + err.message });
+    }
+});
+
 // Serve static files from root
 // Note: In a production app, we'd structure this better (e.g., all static in /public)
 // For now, we serve specific directories to keep the existing structure working
@@ -291,6 +319,12 @@ app.get('/', (req, res) => {
 });
 
 // Start Server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+// Start Server (Only if running locally)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+    });
+}
+
+// Export the app for Vercel (Serverless)
+module.exports = app;

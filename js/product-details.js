@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         addToCart({
             id: product.id,
             name: product.name,
-            price: product.price,
+            price: parseFloat(product.price),
             image: product.image
         });
 

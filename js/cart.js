@@ -54,6 +54,7 @@ function addToCart(product) {
     } else {
         window.trendstore_cart.push({
             ...product,
+            price: parseFloat(product.price),
             quantity: 1
         });
     }

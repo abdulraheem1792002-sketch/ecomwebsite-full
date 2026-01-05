@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="summary-item-info">
                         <h4>${item.name}</h4>
-                        <p class="summary-item-price">$${item.price.toFixed(2)} x ${item.quantity}</p>
+                        <p class="summary-item-price">$${parseFloat(item.price).toFixed(2)} x ${item.quantity}</p>
                     </div>
                     <div style="margin-left: auto; font-weight: 500;">
                         $${itemTotal.toFixed(2)}

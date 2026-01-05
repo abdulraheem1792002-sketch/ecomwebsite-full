@@ -957,19 +957,57 @@ body:has(#cart-toggle:checked) {
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
     .nav-list {
-        display: none;
+        display: flex;
         flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        /* Hidden off-screen */
+        width: 80%;
+        max-width: 400px;
+        height: 100vh;
+        background-color: var(--white);
+        box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        padding: 80px 40px;
+        z-index: 200;
+        transition: right 0.3s ease;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+    /* Show menu when checked */
+    #menu-toggle:checked~.header .nav-list {
+        right: 0;
+    }
+
+    /* Overlay for menu */
+    #menu-toggle:checked~.header::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 150;
     }
 
     .nav-link {
         font-size: 1.2rem;
+        color: var(--text-color);
+        width: 100%;
+        display: block;
+        padding: 5px 0;
+        border-bottom: 1px solid #f0f0f0;
     }
 
     /* Mobile Dropdown Handling */
+    .dropdown {
+        width: 100%;
+    }
+
     .dropdown-menu {
         position: static;
         box-shadow: none;
@@ -977,22 +1015,24 @@ body:has(#cart-toggle:checked) {
         opacity: 1;
         visibility: visible;
         transform: none;
-        background: transparent;
-        padding-left: 0;
-        text-align: center;
-        display: none;
-        /* Hidden by default on mobile to save space */
-    }
-
-    .dropdown:hover .dropdown-menu {
+        background: #f9fafb;
+        padding-left: 20px;
         display: block;
-        /* Show on hover/tap */
+        /* Always show sub-items on mobile */
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border-radius: 4px;
     }
 
     .dropdown-menu li a {
-        padding: 0.5rem 0;
-        font-size: 1.1rem;
+        padding: 0.8rem 0;
+        font-size: 1rem;
         color: var(--text-light);
+        border-bottom: 1px solid #eee;
+    }
+
+    .dropdown-menu li:last-child a {
+        border-bottom: none;
     }
 
     .dropdown-toggle i {
@@ -1002,6 +1042,7 @@ body:has(#cart-toggle:checked) {
 
     .mobile-only {
         display: block;
+        width: 100%;
     }
 
     .header-icons {
@@ -1011,11 +1052,14 @@ body:has(#cart-toggle:checked) {
 
     .mobile-menu-btn {
         display: block;
+        z-index: 201;
+        /* Above the menu so it acts as close button too */
     }
 
-    /* Show menu when checkbox is checked */
-    #menu-toggle:checked~.header .nav-list {
-        display: flex;
+    /* Change Hamburger to X when open */
+    #menu-toggle:checked~.header .mobile-menu-btn i::before {
+        content: "\f00d";
+        /* FontAwesome X icon */
     }
 }
 

@@ -12,15 +12,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // If logged in
         if (user) {
             userBtn.href = '#'; // Disable navigation to signin
-            userBtn.innerHTML = `<i class="fa-solid fa-user-check"></i>`; // Change icon to indicate logged in
+            userBtn.innerHTML = `<i class="fa-solid fa-user-check"></i>`; // Change icon
+
+            // ... (Dropdown logic for Desktop - same as before) ...
 
             // 1. Profile Link
             const profileLink = document.createElement('a');
-            profileLink.href = 'profile.html'; // Assuming you have or will have this
+            profileLink.href = 'profile.html';
             profileLink.textContent = `Hello, ${user.name.split(' ')[0]}`;
             dropdown.appendChild(profileLink);
 
-            // 2. Admin Link (If Admin)
+            // 2. Admin Link
             if (user.role === 'admin') {
                 const adminLink = document.createElement('a');
                 adminLink.href = 'admin.html';
@@ -41,26 +43,40 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             dropdown.appendChild(logoutBtn);
 
-            // Append Dropdown to header (relative to userBtn parent)
-            userBtn.parentElement.style.position = 'relative'; // Ensure positioning context
+            userBtn.parentElement.style.position = 'relative';
             userBtn.parentElement.appendChild(dropdown);
 
-            // Toggle Dropdown
             userBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 dropdown.classList.toggle('active');
             });
 
-            // Close when clicking outside
             document.addEventListener('click', (e) => {
                 if (!userBtn.contains(e.target) && !dropdown.contains(e.target)) {
                     dropdown.classList.remove('active');
                 }
             });
 
+            // --- MOBILE MENU AUTH UPDATES ---
+            const mobileLinks = document.querySelectorAll('.mobile-only a');
+            mobileLinks.forEach(link => {
+                // Find the Sign In link by its href
+                if (link.getAttribute('href') === 'signin.html') {
+                    link.textContent = 'Logout';
+                    link.href = '#';
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        if (confirm('Are you sure you want to log out?')) {
+                            localStorage.removeItem('trendstore_user');
+                            localStorage.removeItem('token');
+                            window.location.href = 'signin.html';
+                        }
+                    });
+                }
+            });
+
         } else {
-            // Not logged in - let default behavior (go to signin.html) happen
-            // Ensure icon is default
+            // Not logged in
             userBtn.innerHTML = `<i class="fa-regular fa-user"></i>`;
         }
     }

@@ -105,6 +105,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.location.href = 'order-confirmation.html?orderId=' + result.orderId;
                 } else {
                     alert('Order Failed: ' + result.message);
+
+                    // If session invalid (401), force logout cleanup
+                    if (response.status === 401) {
+                        localStorage.removeItem('trendstore_user');
+                        localStorage.removeItem('token');
+                        window.location.href = 'signin.html';
+                        return;
+                    }
+
                     btn.textContent = originalText;
                     btn.disabled = false;
                 }

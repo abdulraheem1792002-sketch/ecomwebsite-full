@@ -111,12 +111,17 @@ router.post('/', async (req, res) => {
                 // Retry Insert
                 await db.query(
                     'INSERT INTO orders (id, user_id, status, order_date, data) VALUES ($1, $2, $3, $4, $5)',
-                    [newOrder.id, newOrder.userId || null, newOrder.status, newOrder.date, newOrder]
+                    [newOrder.id, userId, newOrder.status, newOrder.date, newOrder]
                 );
                 return res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder.id });
             } catch (retryErr) {
                 console.error('Auto-creation of orders table failed:', retryErr);
             }
+        }
+
+        // Handle Foreign Key Violation (User ID invalid)
+        if (err.code === '23503') {
+            return res.status(401).json({ message: 'Your session is invalid or the user no longer exists. Please log out and log in again.' });
         }
 
         console.error('Error saving order:', err);

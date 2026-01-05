@@ -3,7 +3,7 @@
 // State
 // State
 window.trendstore_cart = JSON.parse(localStorage.getItem('trendstore_cart')) || [];
-let cart = window.trendstore_cart;
+// No local 'let cart' to avoid desync
 
 // DOM Elements
 const cartSidebar = document.querySelector('.cart-sidebar');
@@ -47,12 +47,12 @@ function attachEventListeners() {
 }
 
 function addToCart(product) {
-    const existingItem = cart.find(item => item.id === product.id);
+    const existingItem = window.trendstore_cart.find(item => item.id === product.id);
 
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
-        cart.push({
+        window.trendstore_cart.push({
             ...product,
             quantity: 1
         });
@@ -63,28 +63,28 @@ function addToCart(product) {
 }
 
 function removeFromCart(id) {
-    cart = cart.filter(item => item.id !== id);
+    window.trendstore_cart = window.trendstore_cart.filter(item => item.id !== id);
     saveCart();
     updateCartUI();
 }
 
 function saveCart() {
-    localStorage.setItem('trendstore_cart', JSON.stringify(cart));
+    localStorage.setItem('trendstore_cart', JSON.stringify(window.trendstore_cart));
 }
 
 function updateCartUI() {
     // Update Counts
-    const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const totalCount = window.trendstore_cart.reduce((sum, item) => sum + item.quantity, 0);
     cartCountElements.forEach(el => el.textContent = totalCount);
 
     // Update Items in Sidebar
     if (cartItemsContainer) {
         cartItemsContainer.innerHTML = '';
 
-        if (cart.length === 0) {
+        if (window.trendstore_cart.length === 0) {
             cartItemsContainer.innerHTML = '<div class="empty-cart-msg">Your cart is empty.</div>';
         } else {
-            cart.forEach(item => {
+            window.trendstore_cart.forEach(item => {
                 const cartItem = document.createElement('div');
                 cartItem.classList.add('cart-item');
                 // Ensure image path is correct relative to HTML
@@ -106,7 +106,7 @@ function updateCartUI() {
     }
 
     // Update Total Price
-    const total = cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
+    const total = window.trendstore_cart.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
     if (cartTotalElement) {
         cartTotalElement.textContent = '$' + total.toFixed(2);
     }

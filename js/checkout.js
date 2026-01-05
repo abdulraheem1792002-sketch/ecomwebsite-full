@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutForm = document.getElementById('checkout-form');
 
     // Render Order Summary
+    window.renderCheckoutSummary = renderOrderSummary; // Expose for debug/re-render
     renderOrderSummary();
 
     function renderOrderSummary() {

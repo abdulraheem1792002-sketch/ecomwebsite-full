@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
             logoutBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> Logout';
             logoutBtn.addEventListener('click', () => {
                 if (confirm('Are you sure you want to log out?')) {
-                    localStorage.removeItem('user');
+                    localStorage.removeItem('trendstore_user');
                     localStorage.removeItem('token');
                     window.location.href = 'signin.html';
                 }
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await safeJson(res);
 
                 if (res.ok) {
-                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('trendstore_user', JSON.stringify(data.user));
                     localStorage.setItem('token', 'dummy-jwt-token');
                     window.location.href = 'index.html';
                 } else {
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const legacyLogout = document.getElementById('logout-btn');
     if (legacyLogout && !userBtn) { // Only bind if not using the dropdown logic
         legacyLogout.addEventListener('click', () => {
-            localStorage.removeItem('user');
+            localStorage.removeItem('trendstore_user');
             localStorage.removeItem('token');
             window.location.href = 'signin.html';
         });

@@ -1,0 +1,42 @@
+/* CSS for User Dropdown */
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    width: 200px;
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.user-dropdown.active {
+    display: flex;
+}
+
+.user-dropdown a, .user-dropdown button {
+    padding: 12px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+    font-family: inherit;
+    transition: background 0.2s;
+}
+
+.user-dropdown a:hover, .user-dropdown button:hover {
+    background: #f9f9f9;
+    color: #000;
+}
+
+.user-dropdown button {
+    color: #e74c3c;
+    border-bottom: none;
+}

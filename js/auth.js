@@ -1,6 +1,72 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Helper to safely parse JSON
+    // --- AUTH STATE MANAGEMENT ---
+    const userBtn = document.querySelector('.user-btn');
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    // Create Dropdown Element
+    const dropdown = document.createElement('div');
+    dropdown.className = 'user-dropdown';
+
+    if (userBtn) {
+        // If logged in
+        if (user) {
+            userBtn.href = '#'; // Disable navigation to signin
+            userBtn.innerHTML = `<i class="fa-solid fa-user-check"></i>`; // Change icon to indicate logged in
+
+            // 1. Profile Link
+            const profileLink = document.createElement('a');
+            profileLink.href = 'profile.html'; // Assuming you have or will have this
+            profileLink.textContent = `Hello, ${user.name.split(' ')[0]}`;
+            dropdown.appendChild(profileLink);
+
+            // 2. Admin Link (If Admin)
+            if (user.role === 'admin') {
+                const adminLink = document.createElement('a');
+                adminLink.href = 'admin.html';
+                adminLink.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Admin Portal';
+                adminLink.style.fontWeight = '600';
+                dropdown.appendChild(adminLink);
+            }
+
+            // 3. Logout Button
+            const logoutBtn = document.createElement('button');
+            logoutBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i> Logout';
+            logoutBtn.addEventListener('click', () => {
+                if (confirm('Are you sure you want to log out?')) {
+                    localStorage.removeItem('user');
+                    localStorage.removeItem('token');
+                    window.location.href = 'signin.html';
+                }
+            });
+            dropdown.appendChild(logoutBtn);
+
+            // Append Dropdown to header (relative to userBtn parent)
+            userBtn.parentElement.style.position = 'relative'; // Ensure positioning context
+            userBtn.parentElement.appendChild(dropdown);
+
+            // Toggle Dropdown
+            userBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                dropdown.classList.toggle('active');
+            });
+
+            // Close when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!userBtn.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.remove('active');
+                }
+            });
+
+        } else {
+            // Not logged in - let default behavior (go to signin.html) happen
+            // Ensure icon is default
+            userBtn.innerHTML = `<i class="fa-regular fa-user"></i>`;
+        }
+    }
+
+
+    // Safe JSON Helper
     const safeJson = async (res) => {
         const text = await res.text();
         try {
@@ -10,7 +76,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // --- SIGN UP ---
+    // --- FORM HANDLERS (Signup, Login, Forgot, Reset) ---
+    // (Keeping existing logic below)
+
+    // ... [Previous Form Logic for Signup/Login/Reset goes here] ...
+    // Since I am overwriting, I will paste the previous reliable logic here again to be safe.
+
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
@@ -39,7 +110,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- SIGN IN ---
     const signinForm = document.getElementById('signin-form');
     if (signinForm) {
         const resetOption = document.getElementById('reset-option');
@@ -76,7 +146,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- FORGOT PASSWORD (Send Link) ---
     const forgotForm = document.getElementById('forgot-password-form');
     if (forgotForm) {
         forgotForm.addEventListener('submit', async (e) => {
@@ -95,9 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     body: JSON.stringify({ email })
                 });
 
-                // If 404, it means the backend route doesn't exist
                 if (res.status === 404) {
-                    alert('Error: The server cannot find the password reset functionality. Please ensure the backend is redeployed.');
+                    alert('Error: Backend outdated. Redeploy.');
                     return;
                 }
 
@@ -113,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- RESET PASSWORD (Set New Password with Token) ---
     const resetPasswordForm = document.getElementById('reset-password-form');
     if (resetPasswordForm) {
         const urlParams = new URLSearchParams(window.location.search);
@@ -121,7 +188,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!token) {
             alert('Invalid or missing reset token.');
-            // window.location.href = 'signin.html'; // Optional: keep them on page to see error
         }
 
         resetPasswordForm.addEventListener('submit', async (e) => {
@@ -138,7 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 if (res.status === 404) {
-                    alert('Error: The server cannot find the password reset functionality. Backend outdated.');
+                    alert('Error: Backend outdated.');
                     btn.disabled = false;
                     return;
                 }
@@ -160,10 +226,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LOGOUT ---
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
+    // Legacy Logout (if used elsewhere) - redundant with dropdown but safe to keep
+    const legacyLogout = document.getElementById('logout-btn');
+    if (legacyLogout && !userBtn) { // Only bind if not using the dropdown logic
+        legacyLogout.addEventListener('click', () => {
             localStorage.removeItem('user');
             localStorage.removeItem('token');
             window.location.href = 'signin.html';

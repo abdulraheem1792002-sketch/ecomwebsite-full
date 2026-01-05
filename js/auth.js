@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- AUTH STATE MANAGEMENT ---
     const userBtn = document.querySelector('.user-btn');
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(localStorage.getItem('trendstore_user'));
 
     // Create Dropdown Element
     const dropdown = document.createElement('div');

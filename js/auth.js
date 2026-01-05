@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 1. Profile Link
             const profileLink = document.createElement('a');
-            profileLink.href = 'profile.html';
+            profileLink.href = 'my-orders.html';
             profileLink.textContent = `Hello, ${user.name.split(' ')[0]}`;
             dropdown.appendChild(profileLink);
 

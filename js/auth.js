@@ -1,5 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // Helper to safely parse JSON
+    const safeJson = async (res) => {
+        const text = await res.text();
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            return { message: text || res.statusText };
+        }
+    };
+
     // --- SIGN UP ---
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
@@ -15,16 +25,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password })
                 });
-                const data = await res.json();
+                const data = await safeJson(res);
                 if (res.ok) {
                     alert('Registration successful! Please sign in.');
                     window.location.href = 'signin.html';
                 } else {
-                    alert(data.message || 'Registration failed');
+                    alert('Sign Up Failed: ' + (data.message || res.statusText));
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error connecting to server');
+                alert('Connection Error: ' + err.message);
             }
         });
     }
@@ -39,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            // Reset UI
             if (resetOption) resetOption.style.display = 'none';
 
             try {
@@ -48,23 +57,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-                const data = await res.json();
+                const data = await safeJson(res);
 
                 if (res.ok) {
-                    // Save user to localStorage
                     localStorage.setItem('user', JSON.stringify(data.user));
-                    localStorage.setItem('token', 'dummy-jwt-token'); // If using JWT
+                    localStorage.setItem('token', 'dummy-jwt-token');
                     window.location.href = 'index.html';
                 } else {
-                    alert(data.message || 'Login failed');
-                    // Show Reset Option if password incorrect
+                    alert('Login Failed: ' + (data.message || res.statusText));
                     if (res.status === 401 && resetOption) {
                         resetOption.style.display = 'block';
                     }
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error connecting to server');
+                alert('Connection Error: ' + err.message);
             }
         });
     }
@@ -87,15 +94,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
                 });
-                const data = await res.json();
 
-                // Always show success message for security (or honest message)
-                // Backend returns "If account exists..."
-                alert(data.message);
+                // If 404, it means the backend route doesn't exist
+                if (res.status === 404) {
+                    alert('Error: The server cannot find the password reset functionality. Please ensure the backend is redeployed.');
+                    return;
+                }
+
+                const data = await safeJson(res);
+                alert(data.message || 'Request processed.');
 
             } catch (err) {
                 console.error(err);
-                alert('Error connecting to server');
+                alert('Connection Error: ' + err.message);
             } finally {
                 btn.innerText = 'Link Sent';
             }
@@ -105,14 +116,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- RESET PASSWORD (Set New Password with Token) ---
     const resetPasswordForm = document.getElementById('reset-password-form');
     if (resetPasswordForm) {
-        // 1. Get Token from URL
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
 
         if (!token) {
             alert('Invalid or missing reset token.');
-            window.location.href = 'signin.html';
-            return;
+            // window.location.href = 'signin.html'; // Optional: keep them on page to see error
         }
 
         resetPasswordForm.addEventListener('submit', async (e) => {
@@ -123,29 +132,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 const res = await fetch('/api/auth/reset-password', {
-                    method: 'POST', // Changed from PUT to POST per new route
+                    method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ token, newPassword })
                 });
-                const data = await res.json();
+
+                if (res.status === 404) {
+                    alert('Error: The server cannot find the password reset functionality. Backend outdated.');
+                    btn.disabled = false;
+                    return;
+                }
+
+                const data = await safeJson(res);
 
                 if (res.ok) {
                     alert(data.message);
                     window.location.href = 'signin.html';
                 } else {
-                    alert(data.message || 'Reset failed');
+                    alert('Reset Failed: ' + (data.message || res.statusText));
                     btn.disabled = false;
                 }
             } catch (err) {
                 console.error(err);
-                alert('Error connecting to server');
+                alert('Connection Error: ' + err.message);
                 btn.disabled = false;
             }
         });
     }
 
     // --- LOGOUT ---
-    const logoutBtn = document.getElementById('logout-btn'); // If you add one
+    const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
             localStorage.removeItem('user');

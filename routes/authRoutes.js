@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db');
+const crypto = require('crypto');
+const sendEmail = require('../utils/email');
 
 // POST /api/auth/signup
 router.post('/signup', async (req, res) => {
@@ -135,39 +137,90 @@ router.put('/profile', async (req, res) => {
     }
 });
 
-const sendEmail = require('../utils/email');
+// POST /api/auth/forgot-password
+router.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
 
-// PUT /api/auth/reset-password
-router.put('/reset-password', async (req, res) => {
-    const { email, newPassword } = req.body;
-
-    if (!email || !newPassword) {
-        return res.status(400).json({ message: 'Email and new password are required.' });
+    if (!email) {
+        return res.status(400).json({ message: 'Email is required.' });
     }
 
     try {
+        // 1. Find User
+        const userResult = await db.query('SELECT * FROM users WHERE email = $1', [email]);
+        if (userResult.rowCount === 0) {
+            // Security: Don't reveal user existence
+            return res.json({ message: 'If an account exists with that email, a reset link has been sent.' });
+        }
+        const user = userResult.rows[0];
+
+        // 2. Generate Token
+        const token = crypto.randomBytes(32).toString('hex');
+        const expires = new Date(Date.now() + 3600000); // 1 hour from now
+
+        // 3. Save Token to DB
+        await db.query(
+            'UPDATE users SET reset_token = $1, reset_expires = $2 WHERE id = $3',
+            [token, expires, user.id]
+        );
+
+        // 4. Send Email
+        const resetLink = `${req.transaction ? 'https://' : 'http://'}${req.headers.host}/reset-password.html?token=${token}`;
+
+        await sendEmail(
+            email,
+            'Password Reset Request',
+            `Hello ${user.name},\n\nYou requested a password reset. Please click the link below to set a new password:\n\n${resetLink}\n\nThis link will expire in 1 hour.\n\nIf you did not request this, please ignore this email.`,
+            `<p>Hello ${user.name},</p><p>You requested a password reset. Click the link below to set a new password:</p><p><a href="${resetLink}">Reset Password</a></p><p>This link will expire in 1 hour.</p>`
+        );
+
+        res.json({ message: 'If an account exists with that email, a reset link has been sent.' });
+
+    } catch (err) {
+        console.error('Error in forgot-password:', err);
+        res.status(500).json({ message: 'Failed to process request.' });
+    }
+});
+
+// POST /api/auth/reset-password (Verify Token & Update)
+router.post('/reset-password', async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    if (!token || !newPassword) {
+        return res.status(400).json({ message: 'Token and new password are required.' });
+    }
+
+    try {
+        // 1. Find User with valid token and expiration
         const result = await db.query(
-            'UPDATE users SET password = $1 WHERE email = $2 RETURNING id, name',
-            [newPassword, email]
+            'SELECT * FROM users WHERE reset_token = $1 AND reset_expires > $2',
+            [token, new Date()]
         );
 
         if (result.rowCount === 0) {
-            return res.status(404).json({ message: 'No user found with that email.' });
+            return res.status(400).json({ message: 'Invalid or expired password reset token.' });
         }
 
         const user = result.rows[0];
 
-        // Send Notification Email
-        await sendEmail(
-            email,
-            'Password Reset Successful',
-            `Hello ${user.name},\n\nYour password for TrendStore has been successfully reset. If you did not perform this action, please contact support immediately.`
+        // 2. Update Password and Clear Token
+        await db.query(
+            'UPDATE users SET password = $1, reset_token = NULL, reset_expires = NULL WHERE id = $2',
+            [newPassword, user.id]
         );
 
-        res.json({ message: 'Password reset successfully. Check your email for confirmation.' });
+        // 3. Notify User
+        await sendEmail(
+            user.email,
+            'Password Changed',
+            `Hello ${user.name},\n\nYour password has been successfully changed.`
+        );
+
+        res.json({ message: 'Password has been reset successfully. You can now login.' });
+
     } catch (err) {
         console.error('Error resetting password:', err);
-        res.status(500).json({ message: 'Failed to reset password.', error: err.message });
+        res.status(500).json({ message: 'Failed to reset password.' });
     }
 });
 

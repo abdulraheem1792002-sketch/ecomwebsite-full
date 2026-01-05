@@ -3,7 +3,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Reuse cart array from cart.js (it is global there)
     // Or simpler: re-read from localStorage to be self-contained
-    let cart = JSON.parse(localStorage.getItem('trendstore_cart')) || [];
+    // Reuse cart array from cart.js (it is global there)
+    // Use the shared global variable to ensure Sidebar and Summary always match
+    let cart = window.trendstore_cart || JSON.parse(localStorage.getItem('trendstore_cart')) || [];
 
     const summaryItemsContainer = document.getElementById('summary-items');
     const summarySubtotal = document.getElementById('summary-subtotal');
@@ -64,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const shippingDetails = Object.fromEntries(formData.entries());
 
             // 2. Gather Cart Data (Re-read to be safe)
-            const currentCart = JSON.parse(localStorage.getItem('trendstore_cart')) || [];
+            const currentCart = window.trendstore_cart || JSON.parse(localStorage.getItem('trendstore_cart')) || [];
             if (currentCart.length === 0) {
                 alert('Your cart is empty!');
                 btn.textContent = originalText;

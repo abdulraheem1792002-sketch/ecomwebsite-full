@@ -1,7 +1,9 @@
 // Shopping Cart Logic
 
 // State
-let cart = JSON.parse(localStorage.getItem('trendstore_cart')) || [];
+// State
+window.trendstore_cart = JSON.parse(localStorage.getItem('trendstore_cart')) || [];
+let cart = window.trendstore_cart;
 
 // DOM Elements
 const cartSidebar = document.querySelector('.cart-sidebar');

@@ -81,10 +81,16 @@ router.post('/', async (req, res) => {
         ...orderData
     };
 
+    // Sanitize userId
+    let userId = newOrder.userId;
+    if (userId === 'guest' || userId === '') {
+        userId = null;
+    }
+
     try {
         await db.query(
             'INSERT INTO orders (id, user_id, status, order_date, data) VALUES ($1, $2, $3, $4, $5)',
-            [newOrder.id, newOrder.userId || null, newOrder.status, newOrder.date, newOrder]
+            [newOrder.id, userId, newOrder.status, newOrder.date, newOrder]
         );
 
         res.status(201).json({ message: 'Order placed successfully!', orderId: newOrder.id });

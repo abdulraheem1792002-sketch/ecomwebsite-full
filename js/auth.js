@@ -1,19 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Session Management (Run on all pages) ---
-    checkSession();
-
-    // --- Logout Logic (Global) ---
-    // Since logout button might be dynamically added by checkSession, we use delegation or attach after render.
-    // Easier: attach to document and check target.
-    document.addEventListener('click', (e) => {
-        if (e.target.closest('#logout-btn')) {
-            e.preventDefault();
-            logout();
-        }
-    });
-
-    // --- Signup Form Handling ---
+    // --- SIGN UP ---
     const signupForm = document.getElementById('signup-form');
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
@@ -21,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = document.getElementById('name').value;
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            // Confirm password check if field exists, but let's keep it simple for now
 
             try {
                 const res = await fetch('/api/auth/signup', {
@@ -29,29 +15,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, password })
                 });
-
                 const data = await res.json();
-
                 if (res.ok) {
-                    alert('Account created! Please sign in.');
+                    alert('Registration successful! Please sign in.');
                     window.location.href = 'signin.html';
                 } else {
-                    alert(data.message + (data.error ? '\nError: ' + data.error : ''));
+                    alert(data.message || 'Registration failed');
                 }
             } catch (err) {
                 console.error(err);
-                alert('Something went wrong.');
+                alert('Error connecting to server');
             }
         });
     }
 
-    // --- Login Form Handling ---
+    // --- SIGN IN ---
     const signinForm = document.getElementById('signin-form');
     if (signinForm) {
+        const resetOption = document.getElementById('reset-option');
+
         signinForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+
+            // Reset UI
+            if (resetOption) resetOption.style.display = 'none';
 
             try {
                 const res = await fetch('/api/auth/login', {
@@ -59,108 +48,109 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-
                 const data = await res.json();
 
                 if (res.ok) {
-                    // Check if there's a "Remember me" checkbox (optional)
-                    // Save to localStorage
-                    localStorage.setItem('trendstore_user', JSON.stringify(data.user));
-
-                    alert('Welcome back, ' + data.user.name + '!');
+                    // Save user to localStorage
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('token', 'dummy-jwt-token'); // If using JWT
                     window.location.href = 'index.html';
                 } else {
-                    alert(data.message + (data.error ? '\nError: ' + data.error : ''));
+                    alert(data.message || 'Login failed');
+                    // Show Reset Option if password incorrect
+                    if (res.status === 401 && resetOption) {
+                        resetOption.style.display = 'block';
+                    }
                 }
             } catch (err) {
                 console.error(err);
-                alert('Connection error.');
+                alert('Error connecting to server');
             }
+        });
+    }
+
+    // --- FORGOT PASSWORD (Send Link) ---
+    const forgotForm = document.getElementById('forgot-password-form');
+    if (forgotForm) {
+        forgotForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const btn = forgotForm.querySelector('button');
+            const originalText = btn.innerText;
+
+            btn.innerText = 'Sending...';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+
+                // Always show success message for security (or honest message)
+                // Backend returns "If account exists..."
+                alert(data.message);
+
+            } catch (err) {
+                console.error(err);
+                alert('Error connecting to server');
+            } finally {
+                btn.innerText = 'Link Sent';
+            }
+        });
+    }
+
+    // --- RESET PASSWORD (Set New Password with Token) ---
+    const resetPasswordForm = document.getElementById('reset-password-form');
+    if (resetPasswordForm) {
+        // 1. Get Token from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (!token) {
+            alert('Invalid or missing reset token.');
+            window.location.href = 'signin.html';
+            return;
+        }
+
+        resetPasswordForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newPassword = document.getElementById('new-password').value;
+            const btn = resetPasswordForm.querySelector('button');
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/auth/reset-password', {
+                    method: 'POST', // Changed from PUT to POST per new route
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token, newPassword })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert(data.message);
+                    window.location.href = 'signin.html';
+                } else {
+                    alert(data.message || 'Reset failed');
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error connecting to server');
+                btn.disabled = false;
+            }
+        });
+    }
+
+    // --- LOGOUT ---
+    const logoutBtn = document.getElementById('logout-btn'); // If you add one
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            window.location.href = 'signin.html';
         });
     }
 });
-
-function checkSession() {
-    const userStr = localStorage.getItem('trendstore_user');
-    if (userStr) {
-        const user = JSON.parse(userStr);
-        updateHeaderLoggedIn(user);
-    }
-}
-
-function updateHeaderLoggedIn(user) {
-    // 1. Desktop Icon Handling (User Profile)
-    const userBtn = document.querySelector('.user-btn');
-    if (userBtn) {
-        // ALWAYS link to My Orders (or Profile in future) for the User Icon
-        userBtn.href = 'my-orders.html';
-        userBtn.innerHTML = '<i class="fa-solid fa-user-check"></i>';
-        userBtn.title = `Hi, ${user.name}`;
-    }
-
-    // 2. Admin Dashboard Icon (New)
-    const headerIcons = document.querySelector('.header-icons');
-    if (headerIcons && user.role === 'admin' && !document.getElementById('admin-dashboard-btn')) {
-        const adminBtn = document.createElement('a');
-        adminBtn.href = 'admin.html';
-        adminBtn.className = 'icon-btn';
-        adminBtn.id = 'admin-dashboard-btn';
-        adminBtn.innerHTML = '<i class="fa-solid fa-gauge-high"></i>'; // Dashboard Icon
-        adminBtn.title = 'Admin Dashboard';
-        adminBtn.style.color = 'var(--secondary-color)'; // Make it stand out
-
-        // Insert as first icon
-        headerIcons.insertBefore(adminBtn, headerIcons.firstChild);
-    }
-
-    // 3. Mobile Menu Handling
-    const navList = document.querySelector('.nav-list');
-    if (navList) {
-        // Find existing Sign In link
-        const signInLink = Array.from(navList.querySelectorAll('a')).find(a => a.getAttribute('href') === 'signin.html');
-
-        if (signInLink) {
-            signInLink.textContent = `Hi, ${user.name} (My Orders)`;
-            signInLink.href = 'my-orders.html';
-
-            // Add Admin Link for Mobile
-            if (user.role === 'admin' && !document.getElementById('mobile-admin-link')) {
-                const adminLi = document.createElement('li');
-                adminLi.className = 'mobile-only';
-                adminLi.id = 'mobile-admin-link';
-                adminLi.innerHTML = '<a href="admin.html" class="nav-link" style="color: var(--secondary-color);">Admin Dashboard</a>';
-                signInLink.parentElement.before(adminLi);
-            }
-
-            // Add Logout Link (if not already there)
-            if (!document.getElementById('mobile-logout')) {
-                const logoutLi = document.createElement('li');
-                logoutLi.className = 'mobile-only';
-                logoutLi.innerHTML = '<a href="#" id="logout-btn" class="nav-link">Logout</a>';
-                signInLink.parentElement.after(logoutLi);
-            }
-        }
-    }
-
-    // 4. Desktop Logout Icon
-    if (headerIcons && !document.getElementById('desktop-logout-btn')) {
-        const logoutBtn = document.createElement('a');
-        logoutBtn.href = '#';
-        logoutBtn.className = 'icon-btn';
-        logoutBtn.id = 'desktop-logout-btn';
-        logoutBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i>'; // Logout Icon
-        logoutBtn.title = 'Logout';
-
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            logout();
-        });
-
-        headerIcons.appendChild(logoutBtn);
-    }
-}
-
-function logout() {
-    localStorage.removeItem('trendstore_user');
-    window.location.reload();
-}

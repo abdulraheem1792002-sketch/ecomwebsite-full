@@ -135,4 +135,40 @@ router.put('/profile', async (req, res) => {
     }
 });
 
+const sendEmail = require('../utils/email');
+
+// PUT /api/auth/reset-password
+router.put('/reset-password', async (req, res) => {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+        return res.status(400).json({ message: 'Email and new password are required.' });
+    }
+
+    try {
+        const result = await db.query(
+            'UPDATE users SET password = $1 WHERE email = $2 RETURNING id, name',
+            [newPassword, email]
+        );
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ message: 'No user found with that email.' });
+        }
+
+        const user = result.rows[0];
+
+        // Send Notification Email
+        await sendEmail(
+            email,
+            'Password Reset Successful',
+            `Hello ${user.name},\n\nYour password for TrendStore has been successfully reset. If you did not perform this action, please contact support immediately.`
+        );
+
+        res.json({ message: 'Password reset successfully. Check your email for confirmation.' });
+    } catch (err) {
+        console.error('Error resetting password:', err);
+        res.status(500).json({ message: 'Failed to reset password.', error: err.message });
+    }
+});
+
 module.exports = router;

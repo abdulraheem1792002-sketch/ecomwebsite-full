@@ -1,20 +1,12 @@
-const { Pool } = require('pg');
+```javascript
+const { createPool } = require('@vercel/postgres');
 require('dotenv').config();
 
-// Remove 'sslmode=require' from URL if present to avoid conflict with our explicit config
-// Handle connection string - strip sslmode to avoid conflicts with explicit config
-let connectionString = process.env.POSTGRES_URL;
-if (connectionString && connectionString.includes('?')) {
-    connectionString = connectionString.split('?')[0];
-}
-
-const pool = new Pool({
-    connectionString,
-    ssl: connectionString && connectionString.includes('localhost') ? false : {
-        rejectUnauthorized: false
-    }
+const pool = createPool({
+    connectionString: process.env.POSTGRES_URL,
 });
 
 module.exports = {
     query: (text, params) => pool.query(text, params),
 };
+```
